@@ -130,16 +130,7 @@ collections:
         widget: "markdown"
         hint: >
           Use Rich Text mode for normal writing (toolbar available).
-          Click the '</>' icon in toolbar to switch to Raw HTML/Markdown mode.
+          Click the raw toggle button in the toolbar to paste raw HTML or Markdown directly.
         modes:
           - rich_text
           - raw
-        buttons:
-          - bold
-          - italic
-          - title
-          - bulleted-list
-          - numbered-list
-          - quote
-          - link
-          - code
