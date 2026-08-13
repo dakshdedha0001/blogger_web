@@ -1,0 +1,208 @@
+---
+// src/components/SubNav.astro
+// src/components/SubNav.astro
+import { Image } from 'astro:assets';
+---
+
+<div class="sticky top-[44px] z-40 h-[52px] bg-canvas-parchment/80 backdrop-blur-md border-b border-hairline w-full">
+  <div class="max-w-[1024px] mx-auto h-full px-4 md:px-[24px] flex items-center justify-between">
+    <!-- Logo in Original Colors -->
+    <a href="/" class="flex items-center gap-1.5 md:hidden hover:opacity-90 transition-opacity">
+      <Image 
+        src="/logo.png" 
+        alt="Learn SAP Free"
+        width={150}
+        height={24}
+        class="h-[24px] w-auto object-contain"
+      />
+    </a>
+
+    <!-- Sub-nav Actions -->
+    <div class="flex items-center gap-[16px] font-button-utility">
+      <a href="/blog" class="text-ink hover:text-primary transition-colors hidden sm:inline-block">Blog</a>
+      <a href="/tcodes" class="text-ink hover:text-primary transition-colors hidden sm:inline-block">T-Codes</a>
+      <a href="/quiz" class="text-ink hover:text-primary transition-colors hidden sm:inline-block">Quiz</a>
+      <button 
+        id="subscribe-trigger"
+        class="bg-primary text-body-on-dark font-body-apple text-[14px] px-[14px] py-[6px] rounded-full hover:bg-primary-focus transition-all duration-150 cursor-pointer active:scale-95"
+      >
+        Subscribe
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Simple Apple-style frosted overlay newsletter modal -->
+<div 
+  id="subscribe-modal" 
+  class="hidden fixed inset-0 z-50 flex items-center justify-center bg-surface-black/60 backdrop-blur-sm transition-opacity duration-300"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="subscribe-modal-title"
+>
+  <div 
+    class="bg-canvas max-w-[420px] w-full mx-4 rounded-lg border border-hairline p-[32px] shadow-product relative flex flex-col items-center text-center"
+    tabindex="-1"
+  >
+    <!-- Close button -->
+    <button 
+      id="modal-close"
+      class="absolute top-4 right-4 w-[32px] h-[32px] rounded-full flex items-center justify-center bg-canvas-parchment hover:bg-surface-chip-translucent transition-colors cursor-pointer text-ink"
+      aria-label="Close modal"
+    >
+      <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+      </svg>
+    </button>
+
+    <!-- Modal Content -->
+    <div class="w-[56px] h-[56px] bg-canvas-parchment rounded-full flex items-center justify-center mb-6">
+      <svg class="w-6 h-6 text-primary fill-none stroke-current stroke-[2]" viewBox="0 0 24 24">
+        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+        <polyline points="22,6 12,13 2,6"></polyline>
+      </svg>
+    </div>
+
+    <h3 id="subscribe-modal-title" class="font-display-md text-[24px] tracking-tight leading-none mb-3 text-ink">Learn SAP Free</h3>
+    <p class="font-body-apple text-[14px] text-ink-muted-80 leading-relaxed mb-6">
+      Join 10,000+ SAP developers and consultants. Get one highly actionable SAP tip, code snippet, or guide delivered straight to your inbox daily.
+    </p>
+
+    <!-- Form -->
+    <form id="subscribe-form" class="w-full flex flex-col gap-3">
+      <label for="subscribe-email" class="sr-only">Email address</label>
+      <input 
+        id="subscribe-email"
+        name="email"
+        type="email" 
+        required 
+        autocomplete="email"
+        spellcheck="false"
+        aria-label="Email address"
+        placeholder="Enter your email" 
+        class="w-full h-[44px] px-4 rounded-lg border border-hairline focus:outline-none focus:border-primary font-body-apple text-[15px] bg-canvas text-ink"
+      />
+      <button 
+        type="submit" 
+        class="button-primary w-full h-[44px] font-semibold text-[15px]"
+      >
+        Sign Up Free
+      </button>
+    </form>
+
+    <!-- Success message -->
+    <div id="subscribe-success" class="hidden flex-col items-center gap-2 mt-4 text-green-600 font-body-apple text-[14px]">
+      <svg class="w-5 h-5 stroke-current fill-none stroke-[2]" viewBox="0 0 24 24">
+        <polyline points="20 6 9 17 4 12"></polyline>
+      </svg>
+      <span>Thank you! You're subscribed to Learn SAP Free.</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  const subscribeTrigger = document.getElementById('subscribe-trigger');
+  const subscribeModal = document.getElementById('subscribe-modal');
+  const modalClose = document.getElementById('modal-close');
+  const subscribeForm = document.getElementById('subscribe-form');
+  const subscribeSuccess = document.getElementById('subscribe-success');
+
+  let lastActiveElement: HTMLElement | null = null;
+
+  const focusFirstElement = () => {
+    if (!subscribeModal) return;
+    // Prefer focusing the email input directly to save user action, fallback to first visible focusable element
+    const emailInput = subscribeModal.querySelector('input[type="email"]') as HTMLElement | null;
+    if (emailInput && emailInput.offsetWidth > 0 && emailInput.offsetHeight > 0) {
+      emailInput.focus();
+    } else {
+      const focusable = Array.from(
+        subscribeModal.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        )
+      ).filter(el => !el.hasAttribute('disabled') && el.offsetWidth > 0 && el.offsetHeight > 0);
+      focusable[0]?.focus?.();
+    }
+  };
+
+  const trapFocus = (e: KeyboardEvent) => {
+    if (e.key !== 'Tab' || !subscribeModal) return;
+
+    const focusable = Array.from(
+      subscribeModal.querySelectorAll<HTMLElement>(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      )
+    ).filter(el => !el.hasAttribute('disabled') && el.offsetWidth > 0 && el.offsetHeight > 0);
+
+    if (focusable.length === 0) return;
+
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    const active = document.activeElement as HTMLElement | null;
+
+    if (e.shiftKey) {
+      if (active === first || !subscribeModal.contains(active)) {
+        e.preventDefault();
+        last.focus();
+      }
+    } else {
+      if (active === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+  };
+
+  const openModal = () => {
+    if (!subscribeModal) return;
+    lastActiveElement = document.activeElement as HTMLElement | null;
+
+    subscribeModal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+
+    // Move focus into dialog
+    focusFirstElement();
+    subscribeModal.addEventListener('keydown', trapFocus);
+  };
+
+  const closeModal = () => {
+    if (!subscribeModal) return;
+
+    subscribeModal.classList.add('hidden');
+    document.body.style.overflow = '';
+
+    if (subscribeForm && subscribeSuccess) {
+      subscribeForm.classList.remove('hidden');
+      subscribeSuccess.classList.add('hidden');
+      (subscribeForm as HTMLFormElement).reset();
+    }
+
+    // Restore focus back to the trigger
+    lastActiveElement?.focus?.();
+
+    subscribeModal.removeEventListener('keydown', trapFocus);
+  };
+
+  subscribeTrigger?.addEventListener('click', openModal);
+
+  modalClose?.addEventListener('click', closeModal);
+  subscribeModal?.addEventListener('click', (e) => {
+    if (e.target === subscribeModal) closeModal();
+  });
+
+  subscribeForm?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    subscribeForm.classList.add('hidden');
+    subscribeSuccess?.classList.remove('hidden');
+    setTimeout(() => {
+      closeModal();
+    }, 2500);
+  });
+
+  // Also close on ESC (global safeguard)
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    if (!subscribeModal || subscribeModal.classList.contains('hidden')) return;
+    closeModal();
+  });
+</script>

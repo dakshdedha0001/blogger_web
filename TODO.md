@@ -1,0 +1,3 @@
+- [x] Update `src/layouts/Layout.astro` with stronger SEO meta (twitter tags, theme-color, canonical handling via `Astro.site` + current URL)
+- [x] Update `src/components/SubNav.astro` newsletter modal accessibility: `role="dialog"`, `aria-modal`, `aria-labelledby`, focus trapping, ESC close, restore focus to trigger
+- [x] Run build/lint/tests (if available) and ensure no TS/runtime errors

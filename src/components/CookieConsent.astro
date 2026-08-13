@@ -1,0 +1,153 @@
+---
+// src/components/CookieConsent.astro
+// GDPR-compliant cookie consent banner for Google AdSense & Analytics
+---
+
+<!-- Cookie Consent Banner -->
+<div
+  id="cookie-consent-banner"
+  class="fixed bottom-0 left-0 right-0 z-[150] hidden"
+  role="dialog"
+  aria-modal="false"
+  aria-label="Cookie consent"
+>
+  <!-- Frosted backdrop -->
+  <div class="bg-canvas/95 backdrop-blur-md border-t border-hairline shadow-[0_-4px_24px_rgba(0,0,0,0.08)]">
+    <div class="max-w-[960px] mx-auto px-4 py-5 md:py-6">
+      <div class="flex flex-col md:flex-row md:items-center gap-4 md:gap-6">
+        <!-- Text Content -->
+        <div class="flex-grow">
+          <h3 class="font-body-strong text-[15px] text-ink mb-1.5">We value your privacy</h3>
+          <p class="font-caption text-[13px] text-ink-muted-80 leading-relaxed max-w-[640px]">
+            We use cookies for analytics (Google Analytics) and to display relevant advertisements (Google AdSense). 
+            By clicking "Accept All", you consent to our use of cookies. 
+            Read our <a href="/cookie-policy" class="text-link underline">Cookie Policy</a> and 
+            <a href="/privacy-policy" class="text-link underline">Privacy Policy</a>.
+          </p>
+        </div>
+        <!-- Action Buttons -->
+        <div class="flex items-center gap-3 shrink-0">
+          <button
+            id="cookie-reject-btn"
+            type="button"
+            class="px-5 py-2.5 rounded-full border border-hairline bg-canvas text-ink font-caption-strong text-[13px] hover:bg-canvas-parchment transition-colors cursor-pointer"
+          >
+            Reject All
+          </button>
+          <button
+            id="cookie-accept-btn"
+            type="button"
+            class="px-5 py-2.5 rounded-full bg-primary text-white font-caption-strong text-[13px] hover:opacity-90 transition-opacity cursor-pointer border-none"
+          >
+            Accept All
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const initCookieConsent = () => {
+    const banner = document.getElementById('cookie-consent-banner');
+    const acceptBtn = document.getElementById('cookie-accept-btn');
+    const rejectBtn = document.getElementById('cookie-reject-btn');
+
+    if (!banner || !acceptBtn || !rejectBtn) return;
+
+    const CONSENT_KEY = 'cookie-consent';
+    const consent = localStorage.getItem(CONSENT_KEY);
+
+    // If consent already given, load scripts accordingly
+    if (consent === 'accepted') {
+      loadTrackingScripts();
+      return;
+    }
+    
+    if (consent === 'rejected') {
+      // Don't load tracking scripts, don't show banner
+      return;
+    }
+
+    // No consent recorded — show the banner
+    banner.classList.remove('hidden');
+    banner.classList.add('flex');
+
+    // Animate in with a slight delay
+    requestAnimationFrame(() => {
+      banner.style.transition = 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease';
+      banner.style.transform = 'translateY(0)';
+      banner.style.opacity = '1';
+    });
+
+    acceptBtn.addEventListener('click', () => {
+      localStorage.setItem(CONSENT_KEY, 'accepted');
+      hideBanner();
+      loadTrackingScripts();
+    });
+
+    rejectBtn.addEventListener('click', () => {
+      localStorage.setItem(CONSENT_KEY, 'rejected');
+      hideBanner();
+      // Remove any existing GA/AdSense cookies
+      removeTrackingCookies();
+    });
+
+    function hideBanner() {
+      banner.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+      banner.style.transform = 'translateY(100%)';
+      banner.style.opacity = '0';
+      setTimeout(() => {
+        banner.classList.add('hidden');
+        banner.classList.remove('flex');
+      }, 300);
+    }
+  };
+
+  /**
+   * Dynamically load Google Analytics and AdSense scripts
+   * Only called after explicit user consent
+   */
+  function loadTrackingScripts() {
+    // Google Analytics (gtag.js)
+    if (!document.querySelector('script[src*="googletagmanager.com/gtag"]')) {
+      const gtagScript = document.createElement('script');
+      gtagScript.async = true;
+      gtagScript.src = 'https://www.googletagmanager.com/gtag/js?id=G-2RKHYYLLDK';
+      document.head.appendChild(gtagScript);
+
+      gtagScript.onload = () => {
+        (window as any).dataLayer = (window as any).dataLayer || [];
+        function gtag(...args: any[]) {
+          (window as any).dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+        gtag('config', 'G-2RKHYYLLDK');
+      };
+    }
+
+    // Google AdSense
+    if (!document.querySelector('script[src*="pagead2.googlesyndication.com"]')) {
+      const adsScript = document.createElement('script');
+      adsScript.async = true;
+      adsScript.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5063580372617604';
+      adsScript.crossOrigin = 'anonymous';
+      document.head.appendChild(adsScript);
+    }
+  }
+
+  /**
+   * Remove tracking cookies on rejection
+   */
+  function removeTrackingCookies() {
+    const cookiesToRemove = ['_ga', '_gid', '_gat', '__gads', '__gpi'];
+    cookiesToRemove.forEach(name => {
+      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.${window.location.hostname}`;
+      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+    });
+  }
+
+  // Initialize on load and on Astro page navigation
+  initCookieConsent();
+  document.addEventListener('astro:after-swap', initCookieConsent);
+</script>

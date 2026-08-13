@@ -1,0 +1,122 @@
+---
+// src/components/DailyTipCard.astro
+---
+
+<div class="relative bg-surface-tile-2 rounded-lg border border-white/10 p-6 md:p-8 text-body-on-dark shadow-product flex flex-col justify-between min-h-[360px] md:h-[360px] h-auto group">
+  <div>
+    <!-- Category Badge -->
+    <div class="flex items-center justify-between mb-6">
+      <span class="text-[10px] uppercase font-bold tracking-wider px-[8px] py-[3px] rounded-sm bg-white/10 text-body-muted border border-white/5">
+        Pro Shortcut
+      </span>
+      <!-- Sparkle Icon -->
+      <svg class="w-5 h-5 text-primary-on-dark animate-pulse" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 21l-1.813-5.096L2.091 14.12 7.187 13l1.813-5.097 1.813 5.097 5.096 1.025-5.096 1.025zM20.25 5.625L19.5 7.5l-.75-1.875-1.875-.75 1.875-.75.75-1.875.75 1.875 1.875.75-1.875.75zM20.25 18.75l-.75 1.875-.75-1.875-1.875-.75 1.875-.75.75-1.875.75 1.875 1.875.75-1.875.75z"></path>
+      </svg>
+    </div>
+
+    <!-- Interactive Card Title -->
+    <h3 class="font-display-lg text-[22px] tracking-tight leading-snug mb-3">
+      SAP Daily Shortcut
+    </h3>
+    
+    <!-- Revealed Tip Box -->
+    <div id="tip-content-box" class="min-h-[120px] flex flex-col justify-center">
+      <p id="tip-text" class="font-body-apple text-[16px] text-body-muted leading-relaxed transition-all duration-300">
+        Click the button below to reveal an advanced SAP transaction code trick, debug command, or editor shortcut.
+      </p>
+      <div id="tip-detail" class="hidden mt-3 p-2 bg-white/5 rounded border border-white/10 font-mono text-[12px] text-primary-on-dark">
+        <!-- T-Code or command details -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Trigger button -->
+  <button 
+    id="reveal-tip-btn" 
+    class="button-primary w-full text-[15px] font-semibold tracking-wide bg-primary-on-dark text-surface-black hover:bg-white transition-colors duration-150 cursor-pointer active:scale-95"
+  >
+    Reveal Quick Tip
+  </button>
+</div>
+
+<script>
+  // Short micro-tips
+  const TIPS = [
+    {
+      text: "Use prefix `/n` in the command field to open a transaction in the current window session, shutting the active one.",
+      detail: "Example: Entering '/nSE80' closes the current page and launches Object Navigator immediately."
+    },
+    {
+      text: "Use prefix `/o` in the command field to launch a transaction in a brand new session window.",
+      detail: "Example: Entering '/oST22' opens the Dump Analysis tool in a new window, preserving your current work."
+    },
+    {
+      text: "Press `F1` on any SAP GUI field inputs to read technical help, search data element names, and view target database tables.",
+      detail: "Tip: Click the 'Technical Info' wrench icon in the F1 popup to inspect structural table fields."
+    },
+    {
+      text: "Press `F4` on input fields to view the Search Help window, displaying valid search filters and values.",
+      detail: "Shortcut: You can start typing matching parameters before hitting F4 to filter values earlier."
+    },
+    {
+      text: "Type `/nex` in the command input bar to instantly log out of all SAP sessions and close the client window without any confirmation alerts.",
+      detail: "Warning: Unsaved edits will be discarded. Use this for quick system exit when wrapping up."
+    },
+    {
+      text: "Type `/$tab` in the command field to flush the application table buffer instantly, useful after importing table data overrides.",
+      detail: "Important: Requires administrative privileges. Clears cached data elements in local memory buffers."
+    },
+    {
+      text: "Press `Ctrl + Shift + F12` in ABAP Editor (SE38) to hide sidebars and toggle clean, full-screen code editing mode.",
+      detail: "Repeat the shortcut keys to toggle the side navigation structure back into view."
+    },
+    {
+      text: "Press `Ctrl + F2` in the ABAP program editor to execute a type check, validation, and general syntax verification.",
+      detail: "Shortcut: Use 'Ctrl + F3' to activate the code object so that it runs in production."
+    },
+    {
+      text: "Press `F8` in ABAP Editor, Function Builder, or Custom Class builder to immediately run and test the compiled code object.",
+      detail: "Tip: For executable reports, F8 loads the selection screen parameter panel automatically."
+    },
+    {
+      text: "Use the prefix `/h` in the command field before running a transaction or transaction action to launch the ABAP debugger.",
+      detail: "Tip: Works on buttons, input screens, and save actions. Activates runtime debugging."
+    }
+  ];
+
+  const revealBtn = document.getElementById('reveal-tip-btn');
+  const tipText = document.getElementById('tip-text');
+  const tipDetail = document.getElementById('tip-detail');
+
+  let currentTipIndex = -1;
+
+  revealBtn?.addEventListener('click', () => {
+    // Generate new tip index avoiding immediate repeat
+    let nextIndex;
+    do {
+      nextIndex = Math.floor(Math.random() * TIPS.length);
+    } while (nextIndex === currentTipIndex);
+    
+    currentTipIndex = nextIndex;
+    const selectedTip = TIPS[currentTipIndex];
+
+    // Transition effect
+    if (tipText && tipDetail) {
+      tipText.style.opacity = '0';
+      tipDetail.classList.add('hidden');
+      
+      setTimeout(() => {
+        tipText.textContent = selectedTip.text;
+        tipText.style.opacity = '1';
+        
+        tipDetail.textContent = selectedTip.detail;
+        tipDetail.classList.remove('hidden');
+      }, 150);
+    }
+
+    if (revealBtn) {
+      revealBtn.textContent = "Show Another Tip";
+    }
+  });
+</script>

@@ -1,0 +1,268 @@
+---
+// src/components/TCodeLookup.astro
+import { TCODES } from '../data/tcodes';
+---
+
+<div class="w-full">
+  <!-- Interactive Search Frame -->
+  <div class="flex flex-col items-center max-w-[800px] mx-auto text-center mb-[40px]">
+    <span class="text-primary font-caption-strong text-[14px] uppercase tracking-wider mb-2">Instant Lookup</span>
+    <h2 class="font-display-lg text-ink text-[32px] md:text-[40px] tracking-tight mb-4">SAP T-Code Dictionary</h2>
+    <p class="font-body-apple text-[16px] text-ink-muted-80 max-w-[580px] mb-8">
+      Type an SAP Transaction Code or function keyword (e.g., 'SE11', 'debug', 'sales') to instantly discover its purpose, module, and detailed developer tips.
+    </p>
+
+    <!-- Search Input Bar -->
+    <div class="relative w-full max-w-[540px] px-4 md:px-0">
+      <label for="tcode-search-input" class="sr-only">Search SAP transaction codes</label>
+      <div class="absolute inset-y-0 left-4 md:left-4 flex items-center pointer-events-none text-ink-muted-48">
+        <svg class="w-5 h-5 stroke-current fill-none stroke-[2]" viewBox="0 0 24 24">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+      </div>
+      <input 
+        type="text" 
+        id="tcode-search-input"
+        name="tcode-search"
+        aria-label="Search SAP transaction codes"
+        autocomplete="off"
+        spellcheck="false"
+        placeholder="Search SE80, MIGO, Debug, G/L..." 
+        class="w-full h-[48px] pl-12 pr-6 rounded-full border border-hairline focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary-focus/25 font-body-apple text-[16px] bg-canvas text-ink shadow-sm"
+      />
+    </div>
+
+    <!-- Category Filter Chips -->
+    <div class="flex flex-wrap items-center justify-center gap-2 mt-[24px] px-4">
+      <button class="tcode-filter-chip active-chip" data-category="all">All Modules</button>
+      <button class="tcode-filter-chip" data-category="ABAP">ABAP & Dev</button>
+      <button class="tcode-filter-chip" data-category="Basis">Basis & Admin</button>
+      <button class="tcode-filter-chip" data-category="Security">Security & Role</button>
+      <button class="tcode-filter-chip" data-category="MM">Logistics (MM)</button>
+      <button class="tcode-filter-chip" data-category="SD">Logistics (SD)</button>
+      <button class="tcode-filter-chip" data-category="FI">Finance (FI/CO)</button>
+      <button class="tcode-filter-chip" data-category="Fiori">Fiori & UI5</button>
+    </div>
+  </div>
+
+  <!-- Search Results Grid -->
+  <div 
+    id="tcode-results-grid"
+    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[24px] max-w-[1024px] mx-auto px-4 md:px-[24px]"
+  >
+    {TCODES.map(t => (
+      <div 
+        class="tcode-card store-utility-card relative flex flex-col justify-between"
+        data-code={t.code.toLowerCase()}
+        data-desc={t.desc.toLowerCase()}
+        data-summary={t.summary.toLowerCase()}
+        data-module={t.module}
+      >
+        <div>
+          <!-- Header (Code + Badge + Bookmark) -->
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-2">
+              <span class="font-display-lg text-[22px] tracking-tight text-primary font-bold font-mono">{t.code}</span>
+              <button 
+                class="tcode-bookmark-btn text-ink-muted-48 hover:text-primary transition-colors bg-transparent border-none cursor-pointer focus:outline-none p-0 flex items-center"
+                data-code={t.code}
+                data-desc={t.desc}
+                data-module={t.module}
+                aria-label={`Bookmark transaction code ${t.code}`}
+              >
+                <!-- Bookmark Icon (Outline) -->
+                <svg class="tcode-bookmark-outline w-3.5 h-3.5 stroke-current fill-none stroke-[2]" viewBox="0 0 24 24">
+                  <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                </svg>
+                <!-- Bookmark Icon (Filled) -->
+                <svg class="tcode-bookmark-filled w-3.5 h-3.5 stroke-current fill-current stroke-[2] hidden text-primary" viewBox="0 0 24 24">
+                  <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                </svg>
+              </button>
+            </div>
+            <span class="text-[10px] uppercase font-bold tracking-wider px-[8px] py-[3px] rounded-sm bg-canvas-parchment text-ink border border-hairline">
+              {t.module === "FI" ? "FI/CO" : t.module}
+            </span>
+          </div>
+
+          <!-- Title -->
+          <h3 class="font-body-strong text-[17px] text-ink mb-2 leading-tight">{t.desc}</h3>
+          
+          <!-- Summary -->
+          <p class="font-caption text-[14px] text-ink-muted-80 leading-relaxed mb-4">{t.summary}</p>
+        </div>
+
+        <!-- Tip Box -->
+        <div class="mt-4 p-3 bg-surface-pearl rounded-sm border border-divider-soft text-[12px] font-caption text-ink-muted-80">
+          <strong class="text-primary text-[11px] block uppercase tracking-wider mb-1">Expert Tip</strong>
+          {t.tip}
+        </div>
+      </div>
+    ))}
+  </div>
+
+  <!-- Empty State -->
+  <div id="tcode-empty-state" class="hidden text-center py-[64px] text-ink-muted-80 font-body-apple">
+    <svg class="w-12 h-12 stroke-current fill-none stroke-[1.5] mx-auto mb-4 text-ink-muted-48" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="10"></circle>
+      <line x1="15" y1="9" x2="9" y2="15"></line>
+      <line x1="9" y1="9" x2="15" y2="15"></line>
+    </svg>
+    <p class="text-[18px] font-semibold mb-1">No transaction codes found</p>
+    <p class="text-[14px]">Try adjusting your search or selecting a different module filter.</p>
+  </div>
+</div>
+
+<style>
+  /* Filter Chip Design (Apple Configurator Chip) */
+  .tcode-filter-chip {
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-text);
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.0;
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-pill);
+    padding: 10px 16px;
+    cursor: pointer;
+    transition: all 0.15s ease-in-out;
+  }
+  .tcode-filter-chip:hover {
+    border-color: var(--color-ink-muted-48);
+  }
+  .tcode-filter-chip.active-chip {
+    background-color: var(--color-ink);
+    color: var(--color-canvas) !important;
+    border-color: var(--color-ink);
+  }
+  .tcode-card.hidden {
+    display: none !important;
+  }
+</style>
+
+<script>
+  const searchInput = document.getElementById('tcode-search-input') as HTMLInputElement | null;
+  const filterChips = document.querySelectorAll('.tcode-filter-chip');
+  const emptyState = document.getElementById('tcode-empty-state');
+  const cards = document.querySelectorAll('.tcode-card');
+
+  let currentSearch = "";
+  let currentCategory = "all";
+
+  function filterTcodes() {
+    let visibleCount = 0;
+    
+    cards.forEach(card => {
+      const code = card.getAttribute('data-code') || "";
+      const desc = card.getAttribute('data-desc') || "";
+      const summary = card.getAttribute('data-summary') || "";
+      const module = card.getAttribute('data-module') || "";
+
+      // Match search string on Code, Desc, Summary, and Module
+      const matchSearch = 
+        code.includes(currentSearch.toLowerCase()) ||
+        desc.includes(currentSearch.toLowerCase()) ||
+        summary.includes(currentSearch.toLowerCase()) ||
+        module.toLowerCase().includes(currentSearch.toLowerCase());
+      
+      const matchCategory = currentCategory === "all" || module === currentCategory;
+
+      if (matchSearch && matchCategory) {
+        card.classList.remove('hidden');
+        visibleCount++;
+      } else {
+        card.classList.add('hidden');
+      }
+    });
+
+    if (visibleCount === 0) {
+      emptyState?.classList.remove('hidden');
+    } else {
+      emptyState?.classList.add('hidden');
+    }
+  }
+
+  // Handle Search Input Change
+  searchInput?.addEventListener('input', (e) => {
+    currentSearch = (e.target as HTMLInputElement).value;
+    filterTcodes();
+  });
+
+  // Handle Category Filter Selection
+  filterChips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      // Toggle CSS Classes
+      filterChips.forEach(c => c.classList.remove('active-chip'));
+      chip.classList.add('active-chip');
+
+      // Update Active Category
+      currentCategory = chip.getAttribute('data-category') || "all";
+      filterTcodes();
+    });
+  });
+
+  // Initial Run (apply filtering in case search input was restored by browser history)
+  if (searchInput && searchInput.value) {
+    currentSearch = searchInput.value;
+  }
+  filterTcodes();
+
+  // Handle T-Code bookmarking
+  const tcodeBookmarkBtns = document.querySelectorAll('.tcode-bookmark-btn');
+
+  const checkTCodeBookmarkStates = () => {
+    try {
+      const bookmarks = JSON.parse(localStorage.getItem('sap_bookmarks') || '{}');
+      tcodeBookmarkBtns.forEach(btn => {
+        const code = btn.getAttribute('data-code') || "";
+        const isBookmarked = !!bookmarks[`tcode-${code.toLowerCase()}`];
+        const outline = btn.querySelector('.tcode-bookmark-outline');
+        const filled = btn.querySelector('.tcode-bookmark-filled');
+
+        if (isBookmarked) {
+          outline?.classList.add('hidden');
+          filled?.classList.remove('hidden');
+        } else {
+          outline?.classList.remove('hidden');
+          filled?.classList.add('hidden');
+        }
+      });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  tcodeBookmarkBtns.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const code = btn.getAttribute('data-code') || "";
+      const desc = btn.getAttribute('data-desc') || "";
+      const module = btn.getAttribute('data-module') || "";
+      const id = `tcode-${code.toLowerCase()}`;
+
+      try {
+        const bookmarks = JSON.parse(localStorage.getItem('sap_bookmarks') || '{}');
+        if (bookmarks[id]) {
+          delete bookmarks[id];
+        } else {
+          bookmarks[id] = {
+            title: `T-Code ${code}: ${desc}`,
+            category: module,
+            url: `/tcodes?search=${code}`,
+            savedAt: new Date().toISOString()
+          };
+        }
+        localStorage.setItem('sap_bookmarks', JSON.stringify(bookmarks));
+        checkTCodeBookmarkStates();
+
+        window.dispatchEvent(new Event('sap-bookmarks-updated'));
+      } catch (e) {
+        console.error(e);
+      }
+    });
+  });
+
+  checkTCodeBookmarkStates();
+</script>

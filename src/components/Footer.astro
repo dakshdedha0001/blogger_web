@@ -1,0 +1,95 @@
+---
+// src/components/Footer.astro
+import { Image } from 'astro:assets';
+---
+
+<footer class="bg-canvas-parchment text-ink-muted-80 border-t border-hairline py-[64px] " role="contentinfo" aria-label="Site footer">
+  <div class="max-w-[1024px] mx-auto px-4 md:px-[24px]">
+    
+    <!-- Footer Brand Logo -->
+    <div class="mb-[32px] flex items-center justify-start">
+      <a href="/" class="mb-4 inline-block hover:opacity-90 transition-opacity">
+        <Image 
+          src="/logo.png" 
+          alt="Learn SAP Free - Free SAP Training Platform" 
+          width={150}
+          height={32}
+          class="h-[36px] w-auto object-contain"
+        />
+      </a>
+    </div>
+
+    <!-- Links Columns Grid -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-[48px]">
+      <!-- Column 1: Explore -->
+      <div>
+        <h4 class="font-caption-strong text-ink text-[14px] font-semibold mb-[12px]">Explore</h4>
+        <ul class="flex flex-col font-dense-link text-[14px]">
+          <li><a href="/blog" class="hover:text-primary transition-colors">Training Blog</a></li>
+          <li><a href="/tcodes" class="hover:text-primary transition-colors">T-Code Lookup</a></li>
+          <li><a href="/quiz" class="hover:text-primary transition-colors">Quiz Challenge</a></li>
+          <li><a href="/faq" class="hover:text-primary transition-colors">FAQ Support</a></li>
+          <li><a href="/about" class="hover:text-primary transition-colors">About Us</a></li>
+          <li><a href="/contact" class="hover:text-primary transition-colors">Contact Us</a></li>
+          <li><a href="/admin" class="hover:text-primary transition-colors flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-[#0066cc]"></span>Admin Portal</a></li>
+        </ul>
+      </div>
+
+      <!-- Column 2: Legal -->
+      <div>
+        <h4 class="font-caption-strong text-ink text-[14px] font-semibold mb-[12px]">Legal Policy</h4>
+        <ul class="flex flex-col font-dense-link text-[14px]">
+          <li><a href="/privacy-policy" class="hover:text-primary transition-colors">Privacy Policy</a></li>
+          <li><a href="/cookie-policy" class="hover:text-primary transition-colors">Cookie Policy</a></li>
+          <li><a href="/disclaimer" class="hover:text-primary transition-colors">Disclaimer</a></li>
+          <li><a href="/terms-conditions" class="hover:text-primary transition-colors">Terms & Conditions</a></li>
+        </ul>
+      </div>
+
+      <!-- Column 3: Quick Resources -->
+      <div>
+        <h4 class="font-caption-strong text-ink text-[14px] font-semibold mb-[12px]">Resources</h4>
+        <ul class="flex flex-col font-dense-link text-[14px]">
+          <li><a href="https://help.sap.com" target="_blank" rel="noopener noreferrer" class="hover:text-primary transition-colors" aria-label="Visit SAP Help Portal (opens in new tab)">SAP Help Portal</a></li>
+          <li><a href="https://developers.sap.com" target="_blank" rel="noopener noreferrer" class="hover:text-primary transition-colors" aria-label="Visit SAP Developer Center (opens in new tab)">SAP Developer Center</a></li>
+          <li><a href="https://community.sap.com" target="_blank" rel="noopener noreferrer" class="hover:text-primary transition-colors" aria-label="Visit SAP Community (opens in new tab)">SAP Community</a></li>
+          <li><a href="https://learning.sap.com" target="_blank" rel="noopener noreferrer" class="hover:text-primary transition-colors" aria-label="Visit SAP Learning Hub (opens in new tab)">SAP Learning Hub</a></li>
+        </ul>
+      </div>
+
+      <!-- Column 4: Stay Connected -->
+      <div>
+        <h4 class="font-caption-strong text-ink text-[14px] font-semibold mb-[12px]">Stay Connected</h4>
+        <ul class="flex flex-col font-dense-link text-[14px]">
+          <li><a href="https://www.youtube.com/channel/UCTivqSC8zUouAkk-YZEqnKg" target="_blank" rel="noopener noreferrer" class="text-primary font-semibold hover:opacity-85 transition-opacity" aria-label="Visit Learn SAP Free YouTube Channel (opens in new tab)">YouTube Channel</a></li>
+          <li><a href="https://github.com/dakshdedha0001" target="_blank" rel="noopener noreferrer" class="hover:text-primary transition-colors" aria-label="Visit Daksh's GitHub (opens in new tab)">GitHub Profile</a></li>
+          <li><a href="/contact" class="hover:text-primary transition-colors">Contact Form</a></li>
+          <li><a href="#subscribe" id="footer-subscribe" class="hover:text-primary transition-colors">Newsletter</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Divider Line -->
+    <div class="h-[1px] bg-hairline w-full mb-[24px]"></div>
+
+    <!-- Fine Print / Legal Row -->
+    <div class="flex flex-col gap-[12px] font-fine-print text-ink-muted-48 text-[12px] leading-relaxed">
+      <p>
+        Copyright &copy; {new Date().getFullYear()} Learn SAP Free. All rights reserved. Designed to help professionals and developers level up their skills with micro-learning content.
+      </p>
+      <p class="font-micro-legal text-[10px] text-ink-muted-48">
+        Disclaimer: <strong>Learn SAP Free</strong> is an independent community learning resource. SAP, SAP HANA, SAP Fiori, ABAP, BTP, and other SAP products referenced are trademarks or registered trademarks of SAP SE in Germany and other countries. This project is not affiliated, sponsored, associated, or endorsed by SAP SE.
+      </p>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const footerSubscribe = document.getElementById('footer-subscribe');
+  const triggerButton = document.getElementById('subscribe-trigger');
+
+  footerSubscribe?.addEventListener('click', (e) => {
+    e.preventDefault();
+    triggerButton?.click(); // Trigger the SubNav subscription modal
+  });
+</script>

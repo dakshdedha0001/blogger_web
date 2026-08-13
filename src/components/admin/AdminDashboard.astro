@@ -1,0 +1,526 @@
+---
+// src/components/admin/AdminDashboard.astro
+import UserPassGenerator from './UserPassGenerator.astro';
+import ArticleEditor from './ArticleEditor.astro';
+import { getCollection } from 'astro:content';
+
+const blogPosts = await getCollection('blog');
+const formattedPosts = blogPosts.map(post => ({
+  id: post.id,
+  title: post.data.title,
+  description: post.data.description,
+  category: post.data.category,
+  author: post.data.author,
+  pubDate: post.data.pubDate.toISOString().split('T')[0],
+  readingTime: post.data.readingTime || '5 min',
+  tags: post.data.tags || [],
+  status: 'Published'
+}));
+---
+
+<div class="admin-dashboard text-ink dark:text-neutral-100 font-sans pb-16">
+  <!-- TOP ADMIN BAR -->
+  <header class="bg-white dark:bg-[#1c1c1e] border border-hairline dark:border-neutral-800 rounded-2xl p-4 md:p-6 mb-8 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-[#0066cc] text-white flex items-center justify-center font-bold text-lg shadow-sm">
+        SA
+      </div>
+      <div>
+        <div class="flex items-center gap-2">
+          <h1 class="text-xl font-bold tracking-tight text-ink dark:text-white">Learn SAP Free — Super Admin Console</h1>
+          <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">System Live</span>
+        </div>
+        <p class="text-xs text-ink-muted-48 dark:text-neutral-400">Authenticated as <span class="font-mono text-[#0066cc] dark:text-[#2997ff] font-semibold" id="active-session-user">admin</span> • Full Site Control & Author Publishing Suite</p>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-2.5 flex-wrap">
+      <button id="open-editor-header-btn" type="button" class="px-3.5 py-2 bg-[#0066cc] text-white hover:bg-[#0071e3] rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 shadow-sm cursor-pointer">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+        Write & Publish New Article
+      </button>
+
+      <a href="/" target="_blank" class="px-3.5 py-2 bg-surface-pearl dark:bg-neutral-800 hover:bg-hairline dark:hover:bg-neutral-700 text-ink dark:text-white rounded-xl text-xs font-medium transition-colors flex items-center gap-1.5 border border-hairline dark:border-neutral-700">
+        <svg class="w-4 h-4 text-[#0066cc] dark:text-[#2997ff]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+        View Public Site
+      </a>
+
+      <button id="backup-site-json-btn" type="button" class="px-3.5 py-2 bg-[#0066cc]/10 text-[#0066cc] dark:text-[#2997ff] hover:bg-[#0066cc]/20 rounded-xl text-xs font-semibold transition-colors flex items-center gap-1.5 border border-[#0066cc]/20 cursor-pointer">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+        Export Site JSON Backup
+      </button>
+
+      <button id="admin-logout-btn" type="button" class="px-3.5 py-2 bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-500/20 rounded-xl text-xs font-semibold transition-colors flex items-center gap-1.5 border border-red-500/20 cursor-pointer">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 01-3-3h7a3 3 0 013 3v1"></path></svg>
+        Logout Session
+      </button>
+    </div>
+  </header>
+
+  <!-- NAVIGATION TABS -->
+  <div class="flex items-center gap-1 overflow-x-auto pb-3 mb-6 border-b border-hairline dark:border-neutral-800 scrollbar-none">
+    <button class="admin-tab-btn px-4 py-2.5 rounded-xl font-medium text-xs md:text-sm whitespace-nowrap transition-all bg-[#0066cc] text-white shadow-sm cursor-pointer" data-tab="tab-overview">
+      Overview & Metrics
+    </button>
+    <button class="admin-tab-btn px-4 py-2.5 rounded-xl font-medium text-xs md:text-sm whitespace-nowrap transition-all text-ink-muted-80 dark:text-neutral-300 hover:bg-surface-pearl dark:hover:bg-neutral-800 cursor-pointer" data-tab="tab-content">
+      Blog Content Manager (<span id="posts-count-label">{formattedPosts.length}</span>)
+    </button>
+    <button class="admin-tab-btn px-4 py-2.5 rounded-xl font-medium text-xs md:text-sm whitespace-nowrap transition-all text-ink-muted-80 dark:text-neutral-300 hover:bg-surface-pearl dark:hover:bg-neutral-800 cursor-pointer flex items-center gap-1.5" data-tab="tab-security">
+      <svg class="w-3.5 h-3.5 text-[#0066cc] dark:text-[#2997ff]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+      User & Password Security
+    </button>
+    <button class="admin-tab-btn px-4 py-2.5 rounded-xl font-medium text-xs md:text-sm whitespace-nowrap transition-all text-ink-muted-80 dark:text-neutral-300 hover:bg-surface-pearl dark:hover:bg-neutral-800 cursor-pointer" data-tab="tab-config">
+      Site Config & SEO
+    </button>
+    <button class="admin-tab-btn px-4 py-2.5 rounded-xl font-medium text-xs md:text-sm whitespace-nowrap transition-all text-ink-muted-80 dark:text-neutral-300 hover:bg-surface-pearl dark:hover:bg-neutral-800 cursor-pointer" data-tab="tab-datacontrol">
+      T-Codes & Quiz Data
+    </button>
+    <button class="admin-tab-btn px-4 py-2.5 rounded-xl font-medium text-xs md:text-sm whitespace-nowrap transition-all text-ink-muted-80 dark:text-neutral-300 hover:bg-surface-pearl dark:hover:bg-neutral-800 cursor-pointer" data-tab="tab-legal">
+      Cookie & Privacy
+    </button>
+    <button class="admin-tab-btn px-4 py-2.5 rounded-xl font-medium text-xs md:text-sm whitespace-nowrap transition-all text-ink-muted-80 dark:text-neutral-300 hover:bg-surface-pearl dark:hover:bg-neutral-800 cursor-pointer" data-tab="tab-[#backup]">
+      System & Backups
+    </button>
+  </div>
+
+  <!-- TAB CONTENT PANELS -->
+
+  <!-- 1. OVERVIEW TAB -->
+  <div id="tab-overview" class="admin-tab-panel space-y-8">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="bg-white dark:bg-[#1c1c1e] p-5 rounded-2xl border border-hairline dark:border-neutral-800 shadow-sm">
+        <div class="flex justify-between items-start mb-2">
+          <span class="text-xs font-semibold text-ink-muted-48 dark:text-neutral-400 uppercase tracking-wider">Published Articles</span>
+          <span class="p-2 rounded-lg bg-[#0066cc]/10 text-[#0066cc]">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path></svg>
+          </span>
+        </div>
+        <div class="text-3xl font-bold text-ink dark:text-white" id="stat-articles-total">{formattedPosts.length}</div>
+        <p class="text-xs text-emerald-600 dark:text-emerald-400 mt-1 font-medium">Author Publishing Active</p>
+      </div>
+
+      <div class="bg-white dark:bg-[#1c1c1e] p-5 rounded-2xl border border-hairline dark:border-neutral-800 shadow-sm">
+        <div class="flex justify-between items-start mb-2">
+          <span class="text-xs font-semibold text-ink-muted-48 dark:text-neutral-400 uppercase tracking-wider">SAP T-Codes Index</span>
+          <span class="p-2 rounded-lg bg-indigo-500/10 text-indigo-600">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+          </span>
+        </div>
+        <div class="text-3xl font-bold text-ink dark:text-white">100+</div>
+        <p class="text-xs text-indigo-600 dark:text-indigo-400 mt-1 font-medium">Searchable Database</p>
+      </div>
+
+      <div class="bg-white dark:bg-[#1c1c1e] p-5 rounded-2xl border border-hairline dark:border-neutral-800 shadow-sm">
+        <div class="flex justify-between items-start mb-2">
+          <span class="text-xs font-semibold text-ink-muted-48 dark:text-neutral-400 uppercase tracking-wider">Security Vault</span>
+          <span class="p-2 rounded-lg bg-emerald-500/10 text-emerald-600">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+          </span>
+        </div>
+        <div class="text-3xl font-bold text-ink dark:text-white" id="stat-vault-count">2 Accounts</div>
+        <p class="text-xs text-emerald-600 dark:text-emerald-400 mt-1 font-medium">Active Author Logins</p>
+      </div>
+
+      <div class="bg-white dark:bg-[#1c1c1e] p-5 rounded-2xl border border-hairline dark:border-neutral-800 shadow-sm">
+        <div class="flex justify-between items-start mb-2">
+          <span class="text-xs font-semibold text-ink-muted-48 dark:text-neutral-400 uppercase tracking-wider">SEO & AdSense Score</span>
+          <span class="p-2 rounded-lg bg-amber-500/10 text-amber-600">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+          </span>
+        </div>
+        <div class="text-3xl font-bold text-ink dark:text-white">98/100</div>
+        <p class="text-xs text-amber-600 dark:text-amber-400 mt-1 font-medium">High Quality Score</p>
+      </div>
+    </div>
+
+    <!-- Quick Status Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="bg-white dark:bg-[#1c1c1e] p-6 rounded-2xl border border-hairline dark:border-neutral-800 shadow-sm space-y-4">
+        <div class="flex items-center justify-between">
+          <h3 class="text-lg font-bold text-ink dark:text-white">Recent Blog Articles</h3>
+          <button id="open-editor-quick-btn" class="text-xs font-semibold text-[#0066cc] dark:text-[#2997ff] hover:underline cursor-pointer">+ Write New Article</button>
+        </div>
+        <div class="divide-y divide-hairline dark:divide-neutral-800 text-xs">
+          {formattedPosts.slice(0, 4).map(post => (
+            <div class="py-3 flex items-center justify-between gap-4">
+              <div>
+                <p class="font-semibold text-ink dark:text-white line-clamp-1">{post.title}</p>
+                <span class="text-neutral-400">{post.category} • {post.pubDate}</span>
+              </div>
+              <span class="px-2 py-1 rounded bg-[#0066cc]/10 text-[#0066cc] font-mono text-[11px] shrink-0">{post.readingTime}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-[#1c1c1e] p-6 rounded-2xl border border-hairline dark:border-neutral-800 shadow-sm space-y-4">
+        <h3 class="text-lg font-bold text-ink dark:text-white">System Actions & Quick Controllers</h3>
+        <div class="grid grid-cols-2 gap-3 text-xs">
+          <button id="quick-open-author-studio-btn" class="p-3 bg-surface-pearl dark:bg-[#252527] border border-hairline dark:border-neutral-700 rounded-xl text-left hover:border-[#0066cc] transition-all cursor-pointer">
+            <span class="font-bold block text-ink dark:text-white mb-1">Article Studio</span>
+            <span class="text-neutral-400">Write, Image & Publish</span>
+          </button>
+
+          <button id="quick-announcement-toggle" class="p-3 bg-surface-pearl dark:bg-[#252527] border border-hairline dark:border-neutral-700 rounded-xl text-left hover:border-[#0066cc] transition-all cursor-pointer">
+            <span class="font-bold block text-ink dark:text-white mb-1">Announcement Banner</span>
+            <span class="text-neutral-400" id="announcement-status-text">Status: Active</span>
+          </button>
+
+          <button id="quick-generate-pass-tab-btn" class="p-3 bg-surface-pearl dark:bg-[#252527] border border-hairline dark:border-neutral-700 rounded-xl text-left hover:border-[#0066cc] transition-all cursor-pointer">
+            <span class="font-bold block text-ink dark:text-white mb-1">Author Accounts</span>
+            <span class="text-neutral-400">Generate Logins</span>
+          </button>
+
+          <button id="quick-sitemap-btn" class="p-3 bg-surface-pearl dark:bg-[#252527] border border-hairline dark:border-neutral-700 rounded-xl text-left hover:border-[#0066cc] transition-all cursor-pointer">
+            <span class="font-bold block text-ink dark:text-white mb-1">Sitemap Index</span>
+            <span class="text-neutral-400">/sitemap.xml</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. BLOG CONTENT MANAGER TAB -->
+  <div id="tab-content" class="admin-tab-panel hidden space-y-6">
+    <div class="bg-white dark:bg-[#1c1c1e] p-6 rounded-2xl border border-hairline dark:border-neutral-800 shadow-sm">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+        <div>
+          <h2 class="text-xl font-bold text-ink dark:text-white">Blog Content & Publishing Management</h2>
+          <p class="text-xs text-ink-muted-48 dark:text-neutral-400">Manage static articles, user-created posts, uploaded images, drafts, and published content.</p>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <input type="text" id="post-search-input" placeholder="Search articles..." class="bg-surface-pearl dark:bg-[#272729] border border-hairline dark:border-neutral-700 rounded-xl px-3.5 py-2 text-xs text-ink dark:text-white outline-none focus:ring-2 focus:ring-[#0066cc]" />
+          <button id="create-post-modal-trigger-btn" class="px-3.5 py-2 bg-[#0066cc] hover:bg-[#0071e3] text-white rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 shadow-sm cursor-pointer shrink-0">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+            Write & Publish New Article
+          </button>
+        </div>
+      </div>
+
+      <!-- Articles Table -->
+      <div class="overflow-x-auto border border-hairline dark:border-neutral-800 rounded-xl">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-surface-pearl dark:bg-[#252527] text-ink dark:text-neutral-300 font-semibold border-b border-hairline dark:border-neutral-800">
+            <tr>
+              <th class="p-3">Article Title</th>
+              <th class="p-3">Category</th>
+              <th class="p-3">Author</th>
+              <th class="p-3">Date</th>
+              <th class="p-3">Status</th>
+              <th class="p-3 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="posts-table-body" class="divide-y divide-hairline dark:divide-neutral-800 text-ink dark:text-neutral-300">
+            {formattedPosts.map(post => (
+              <tr class="post-row hover:bg-surface-pearl dark:hover:bg-neutral-800/50 transition-colors" data-title={post.title.toLowerCase()} data-category={post.category.toLowerCase()}>
+                <td class="p-3 font-semibold text-ink dark:text-white">
+                  <a href={`/blog/${post.id}`} target="_blank" class="hover:text-[#0066cc] transition-colors">{post.title}</a>
+                </td>
+                <td class="p-3">
+                  <span class="px-2 py-0.5 rounded bg-[#0066cc]/10 text-[#0066cc] dark:text-[#2997ff] text-[11px] font-semibold">{post.category}</span>
+                </td>
+                <td class="p-3">{post.author}</td>
+                <td class="p-3 text-neutral-500 dark:text-neutral-400">{post.pubDate}</td>
+                <td class="p-3">
+                  <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[11px] font-semibold">Published</span>
+                </td>
+                <td class="p-3 text-right space-x-2">
+                  <button onclick={`window.copyPostMarkdown('${post.title}', '${post.category}', '${post.author}')`} class="hover:text-[#0066cc] font-medium cursor-pointer">Copy MD</button>
+                  <button onclick={`alert('Editing post metadata for: ${post.title}')`} class="hover:text-[#0066cc] font-medium cursor-pointer">Edit</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. USER & PASSWORD SECURITY TAB -->
+  <div id="tab-security" class="admin-tab-panel hidden space-y-6">
+    <UserPassGenerator />
+  </div>
+
+  <!-- 4. SITE CONFIG & SEO TAB -->
+  <div id="tab-config" class="admin-tab-panel hidden space-y-6">
+    <div class="bg-white dark:bg-[#1c1c1e] p-6 rounded-2xl border border-hairline dark:border-neutral-800 shadow-sm space-y-6">
+      <div>
+        <h2 class="text-xl font-bold text-ink dark:text-white">Site Configuration & SEO Controller</h2>
+        <p class="text-xs text-ink-muted-48 dark:text-neutral-400">Manage site titles, AdSense Publisher details, announcement bar, and social parameters.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
+        <div>
+          <label class="block font-semibold text-ink dark:text-neutral-200 mb-1.5">Site Name / Brand Title</label>
+          <input type="text" id="cfg-site-title" value="Learn SAP Free" class="w-full bg-surface-pearl dark:bg-[#272729] border border-hairline dark:border-neutral-700 rounded-xl px-4 py-2.5 text-ink dark:text-white outline-none focus:ring-2 focus:ring-[#0066cc]" />
+        </div>
+
+        <div>
+          <label class="block font-semibold text-ink dark:text-neutral-200 mb-1.5">Google AdSense Publisher ID</label>
+          <input type="text" id="cfg-adsense-id" value="ca-pub-XXXXXXXXXXXXXXXX" class="w-full bg-surface-pearl dark:bg-[#272729] border border-hairline dark:border-neutral-700 rounded-xl px-4 py-2.5 text-ink dark:text-white outline-none focus:ring-2 focus:ring-[#0066cc]" />
+        </div>
+
+        <div class="md:col-span-2">
+          <label class="block font-semibold text-ink dark:text-neutral-200 mb-1.5">Default SEO Meta Description</label>
+          <textarea id="cfg-seo-desc" rows="2" class="w-full bg-surface-pearl dark:bg-[#272729] border border-hairline dark:border-neutral-700 rounded-xl p-3 text-ink dark:text-white outline-none focus:ring-2 focus:ring-[#0066cc]">Learn SAP for free with step-by-step tutorials on ABAP programming, SAP Fiori, HANA, BTP, and Basis administration.</textarea>
+        </div>
+
+        <div class="md:col-span-2">
+          <div class="flex justify-between items-center mb-1.5">
+            <label class="font-semibold text-ink dark:text-neutral-200">Announcement Banner Text</label>
+            <label class="flex items-center gap-2 cursor-pointer text-xs">
+              <input type="checkbox" id="cfg-announcement-enable" checked class="w-4 h-4 rounded text-[#0066cc]" />
+              Enable Announcement Banner
+            </label>
+          </div>
+          <input type="text" id="cfg-announcement-text" value="🚀 New SAP BTP Free Tier & ABAP Open SQL Tutorials Released!" class="w-full bg-surface-pearl dark:bg-[#272729] border border-hairline dark:border-neutral-700 rounded-xl px-4 py-2.5 text-ink dark:text-white outline-none focus:ring-2 focus:ring-[#0066cc]" />
+        </div>
+      </div>
+
+      <button id="save-config-btn" type="button" class="px-5 py-2.5 bg-[#0066cc] hover:bg-[#0071e3] text-white rounded-xl text-xs font-semibold transition-all shadow-sm cursor-pointer">
+        Save Configuration Settings
+      </button>
+    </div>
+  </div>
+
+  <!-- 5. T-CODES & QUIZ DATA TAB -->
+  <div id="tab-datacontrol" class="admin-tab-panel hidden space-y-6">
+    <div class="bg-white dark:bg-[#1c1c1e] p-6 rounded-2xl border border-hairline dark:border-neutral-800 shadow-sm space-y-6">
+      <div>
+        <h2 class="text-xl font-bold text-ink dark:text-white">SAP T-Codes & Quiz Dataset Manager</h2>
+        <p class="text-xs text-ink-muted-48 dark:text-neutral-400">View and update SAP Transaction Codes and Quiz Questions dataset.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
+        <div class="p-4 bg-surface-pearl dark:bg-[#272729] rounded-xl border border-hairline dark:border-neutral-700 space-y-3">
+          <h3 class="font-bold text-ink dark:text-white text-sm">SAP Transaction Codes (T-Codes)</h3>
+          <p class="text-neutral-400">Lookup table contains 100+ active T-Codes including SE16N, MM01, ST05, SM30, and PFCG.</p>
+          <a href="/tcodes" target="_blank" class="inline-block text-[#0066cc] font-semibold hover:underline">Launch T-Code Explorer →</a>
+        </div>
+
+        <div class="p-4 bg-surface-pearl dark:bg-[#272729] rounded-xl border border-hairline dark:border-neutral-700 space-y-3">
+          <h3 class="font-bold text-ink dark:text-white text-sm">SAP Skill Quiz Dataset</h3>
+          <p class="text-neutral-400">Includes ABAP, Fiori, HANA, and BTP interactive multiple-choice questions.</p>
+          <a href="/quiz" target="_blank" class="inline-block text-[#0066cc] font-semibold hover:underline">Launch Quiz Challenge →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. COOKIE & PRIVACY TAB -->
+  <div id="tab-legal" class="admin-tab-panel hidden space-y-6">
+    <div class="bg-white dark:bg-[#1c1c1e] p-6 rounded-2xl border border-hairline dark:border-neutral-800 shadow-sm space-y-6">
+      <div>
+        <h2 class="text-xl font-bold text-ink dark:text-white">Cookie Consent & Privacy Controller</h2>
+        <p class="text-xs text-ink-muted-48 dark:text-neutral-400">Configure cookie consent notice text and user privacy compliance settings.</p>
+      </div>
+
+      <div class="space-y-4 text-xs">
+        <div>
+          <label class="block font-semibold text-ink dark:text-neutral-200 mb-1.5">Cookie Consent Notice Text</label>
+          <textarea id="cfg-cookie-text" rows="3" class="w-full bg-surface-pearl dark:bg-[#272729] border border-hairline dark:border-neutral-700 rounded-xl p-3 text-ink dark:text-white outline-none focus:ring-2 focus:ring-[#0066cc]">We use essential cookies and anonymous analytics to improve your SAP learning experience. By continuing to use Learn SAP Free, you consent to our Cookie Policy.</textarea>
+        </div>
+
+        <div class="flex items-center gap-4">
+          <button id="reset-cookie-consent-btn" type="button" class="px-4 py-2 bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-500/20 border border-red-500/20 font-semibold rounded-xl text-xs transition-colors cursor-pointer">
+            Reset Consent State for Current Browser
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. BACKUP TAB -->
+  <div id="tab-[#backup]" class="admin-tab-panel hidden space-y-6">
+    <div class="bg-white dark:bg-[#1c1c1e] p-6 rounded-2xl border border-hairline dark:border-neutral-800 shadow-sm space-y-6">
+      <div>
+        <h2 class="text-xl font-bold text-ink dark:text-white">System Actions & JSON Backups</h2>
+        <p class="text-xs text-ink-muted-48 dark:text-neutral-400">Export or restore site configuration JSON files and credential vaults.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
+        <div class="p-5 bg-surface-pearl dark:bg-[#272729] rounded-xl border border-hairline dark:border-neutral-700 space-y-3">
+          <h3 class="font-bold text-ink dark:text-white text-sm">Download Configuration Backup</h3>
+          <p class="text-neutral-400">Export all site settings, user vaults, author posts, and announcement configurations into a single JSON file.</p>
+          <button id="export-full-json-btn" type="button" class="px-4 py-2 bg-[#0066cc] text-white font-semibold rounded-xl transition-all hover:bg-[#0071e3] cursor-pointer">
+            Download Site Backup (.json)
+          </button>
+        </div>
+
+        <div class="p-5 bg-surface-pearl dark:bg-[#272729] rounded-xl border border-hairline dark:border-neutral-700 space-y-3">
+          <h3 class="font-bold text-ink dark:text-white text-sm">Clear Cache & Reset System State</h3>
+          <p class="text-neutral-400">Simulate system cache refresh and reset temporary local session states.</p>
+          <button id="clear-cache-sim-btn" type="button" class="px-4 py-2 bg-neutral-200 dark:bg-neutral-800 text-ink dark:text-white font-semibold rounded-xl transition-colors hover:bg-neutral-300 dark:hover:bg-neutral-700 cursor-pointer">
+            Clear Local Cache
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ARTICLE EDITOR MODAL -->
+  <ArticleEditor />
+
+</div>
+
+<script>
+  // Tab Switching Logic
+  const tabBtns = document.querySelectorAll('.admin-tab-btn');
+  const tabPanels = document.querySelectorAll('.admin-tab-panel');
+
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const targetTab = btn.getAttribute('data-tab');
+
+      tabBtns.forEach(b => {
+        b.classList.remove('bg-[#0066cc]', 'text-white', 'shadow-sm');
+        b.classList.add('text-ink-muted-80', 'dark:text-neutral-300', 'hover:bg-surface-pearl', 'dark:hover:bg-neutral-800');
+      });
+
+      btn.classList.add('bg-[#0066cc]', 'text-white', 'shadow-sm');
+      btn.classList.remove('text-ink-muted-80', 'dark:text-neutral-300', 'hover:bg-surface-pearl', 'dark:hover:bg-neutral-800');
+
+      tabPanels.forEach(panel => {
+        if (panel.id === targetTab) {
+          panel.classList.remove('hidden');
+        } else {
+          panel.classList.add('hidden');
+        }
+      });
+    });
+  });
+
+  // Active User display
+  const activeUserEl = document.getElementById('active-session-user');
+  const session = localStorage.getItem('admin_session') || sessionStorage.getItem('admin_session');
+  if (session && activeUserEl) {
+    try {
+      const data = JSON.parse(session);
+      activeUserEl.textContent = data.username || 'admin';
+    } catch(e){}
+  }
+
+  // Article Creator Trigger Buttons
+  const openEditorHeaderBtn = document.getElementById('open-editor-header-btn');
+  const openEditorQuickBtn = document.getElementById('open-editor-quick-btn');
+  const openAuthorStudioBtn = document.getElementById('quick-open-author-studio-btn');
+  const createPostModalTriggerBtn = document.getElementById('create-post-modal-trigger-btn');
+
+  [openEditorHeaderBtn, openEditorQuickBtn, openAuthorStudioBtn, createPostModalTriggerBtn].forEach(btn => {
+    btn?.addEventListener('click', () => {
+      window.dispatchEvent(new Event('open_article_editor'));
+    });
+  });
+
+  // Render User-Created Posts into Table
+  const postsTableBody = document.getElementById('posts-table-body');
+  const postsCountLabel = document.getElementById('posts-count-label');
+  const statArticlesTotal = document.getElementById('stat-articles-total');
+
+  function renderUserPosts() {
+    if (!postsTableBody) return;
+    const userPosts = JSON.parse(localStorage.getItem('user_created_posts') || '[]');
+    
+    // Update Counters
+    const totalCount = 65 + userPosts.length;
+    if (postsCountLabel) postsCountLabel.textContent = totalCount.toString();
+    if (statArticlesTotal) statArticlesTotal.textContent = totalCount.toString();
+
+    if (userPosts.length > 0) {
+      const userRowsHtml = userPosts.map((post: any) => `
+        <tr class="post-row bg-amber-500/5 hover:bg-amber-500/10 transition-colors border-l-2 border-amber-500" data-title="${post.title.toLowerCase()}" data-category="${post.category.toLowerCase()}">
+          <td class="p-3 font-semibold text-ink dark:text-white">
+            <span class="hover:text-[#0066cc]">${post.title}</span>
+            <span class="ml-2 text-[10px] text-amber-600 dark:text-amber-400 font-normal">(Author Submission)</span>
+          </td>
+          <td class="p-3">
+            <span class="px-2 py-0.5 rounded bg-[#0066cc]/10 text-[#0066cc] dark:text-[#2997ff] text-[11px] font-semibold">${post.category}</span>
+          </td>
+          <td class="p-3 font-medium text-[#0066cc]">${post.author}</td>
+          <td class="p-3 text-neutral-500 dark:text-neutral-400">${post.pubDate}</td>
+          <td class="p-3">
+            <span class="px-2 py-0.5 rounded ${post.status === 'Draft' ? 'bg-amber-500/20 text-amber-700 dark:text-amber-300' : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'} text-[11px] font-semibold">${post.status}</span>
+          </td>
+          <td class="p-3 text-right space-x-2">
+            <button onclick="window.copyPostMarkdown('${post.title}', '${post.category}', '${post.author}')" class="hover:text-[#0066cc] font-medium cursor-pointer">Copy MD</button>
+            <button onclick="window.deleteUserPost('${post.id}')" class="text-red-500 hover:text-red-600 font-medium cursor-pointer">Delete</button>
+          </td>
+        </tr>
+      `).join('');
+
+      // Prepend user rows above static posts
+      postsTableBody.insertAdjacentHTML('afterbegin', userRowsHtml);
+    }
+  }
+
+  (window as any).deleteUserPost = (id: string) => {
+    let userPosts = JSON.parse(localStorage.getItem('user_created_posts') || '[]');
+    userPosts = userPosts.filter((p: any) => p.id !== id);
+    localStorage.setItem('user_created_posts', JSON.stringify(userPosts));
+    location.reload();
+  };
+
+  window.addEventListener('refresh_posts_table', () => {
+    location.reload();
+  });
+
+  // Logout Button
+  document.getElementById('admin-logout-btn')?.addEventListener('click', () => {
+    if (confirm('Are you sure you want to log out of Super Admin Panel?')) {
+      window.dispatchEvent(new Event('admin_logout'));
+    }
+  });
+
+  // Search Posts
+  const searchInput = document.getElementById('post-search-input') as HTMLInputElement;
+  searchInput?.addEventListener('input', () => {
+    const query = searchInput.value.toLowerCase().trim();
+    const rows = document.querySelectorAll('.post-row');
+    rows.forEach((row: any) => {
+      const title = row.getAttribute('data-title') || '';
+      const cat = row.getAttribute('data-category') || '';
+      if (title.includes(query) || cat.includes(query)) {
+        row.classList.remove('hidden');
+      } else {
+        row.classList.add('hidden');
+      }
+    });
+  });
+
+  // Backup JSON
+  document.getElementById('export-full-json-btn')?.addEventListener('click', exportBackup);
+  document.getElementById('backup-site-json-btn')?.addEventListener('click', exportBackup);
+
+  function exportBackup() {
+    const backupData = {
+      site: 'Learn SAP Free',
+      version: '1.0.0',
+      exportedAt: new Date().toISOString(),
+      vault: JSON.parse(localStorage.getItem('admin_credentials_vault') || '[]'),
+      userPosts: JSON.parse(localStorage.getItem('user_created_posts') || '[]'),
+      announcement: localStorage.getItem('site_announcement') || 'Active'
+    };
+    const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `learn-sap-free-backup-${Date.now()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  // Quick Action triggers
+  document.getElementById('quick-generate-pass-tab-btn')?.addEventListener('click', () => {
+    const secBtn = Array.from(tabBtns).find(b => b.getAttribute('data-tab') === 'tab-security');
+    secBtn?.click();
+  });
+
+  document.getElementById('quick-clear-consent-btn')?.addEventListener('click', () => {
+    localStorage.removeItem('cookie_consent_accepted');
+    alert('Cookie consent reset for this browser!');
+  });
+
+  // Init user posts
+  renderUserPosts();
+</script>

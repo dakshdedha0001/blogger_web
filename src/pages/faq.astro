@@ -1,0 +1,187 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+// Structured FAQ data for rendering and JSON-LD generation
+const faqs = [
+  {
+    question: "How do I learn SAP / How can I learn SAP?",
+    answer: "To learn SAP, the best approach is to start with the fundamentals of the SAP Logon GUI and system navigation. Determine whether you want to focus on technical development (like ABAP programming) or functional operations (like accounting or logistics). Start practicing with standard Transaction Codes (T-codes) and test your daily progress with micro-learning quizzes.",
+    keywordRef: ["how do i learn sap", "how can i learn sap", "sap how to learn", "how do you learn sap"]
+  },
+  {
+    question: "How to learn SAP for free / How can I learn SAP for free?",
+    answer: "You can learn SAP for free using resources like the SAP Help Portal, openSAP training courses, the SAP Developer Center, and independent developer blogs like Learn SAP Free. Our platform offers free learning guides, T-code lookup dictionaries, and interactive quizzes to help you build sandboxed development skills without any costs.",
+    keywordRef: ["how to learn sap for free", "how can i learn sap for free", "learn sap online free"]
+  },
+  {
+    question: "Where to learn SAP / Where can I learn SAP?",
+    answer: "You can learn SAP online through the official SAP Learning Hub, community forums, GitHub repositories, and specialized learning portals. For practical, daily lessons that fit into your busy schedule, Learn SAP Free provides structured micro-learning guides covering core ABAP, database tables, and modern cloud extensibility.",
+    keywordRef: ["where to learn sap", "where can i learn sap"]
+  },
+  {
+    question: "How to learn SAP software / How do I learn SAP software?",
+    answer: "To learn how to use SAP software effectively, begin by understanding standard navigation paradigms. Learn how to launch transactions, customize layouts, and look up reference documentation. Building a strong understanding of technical modules (like database tables, domains, and data elements) will help you grasp how SAP processes enterprise data behind the scenes.",
+    keywordRef: ["how to learn sap software", "how do i learn sap software", "learn how to use sap"]
+  },
+  {
+    question: "How long does it take to learn SAP?",
+    answer: "Learning basic SAP navigation and data entry can take just 1 to 2 weeks. However, mastering advanced system configuration or becoming proficient in custom programming can take between 3 to 6 months of dedicated daily practice. The key to accelerating your training is focusing on bite-sized, practical exercises.",
+    keywordRef: ["how long does it take to learn sap"]
+  },
+  {
+    question: "How to learn SAP ABAP / How much time does it take to learn SAP ABAP?",
+    answer: "To learn SAP ABAP, begin by studying the ABAP Dictionary (SE11) to understand table configurations, domains, and data elements. Once you master the database model, move on to writing basic statements, loops, and OOP classes. Acquiring basic ABAP developer skills takes around 2 to 3 months of consistent coding practice.",
+    keywordRef: ["how to learn sap abap", "how much time does it take to learn sap abap", "learn sap abap online"]
+  },
+  {
+    question: "Which SAP module is easy to learn?",
+    answer: "For beginners, functional modules that mirror real-world business processes are generally the easiest to learn. Modules like SAP MM (Materials Management) or SAP SD (Sales and Distribution) are intuitive for anyone with a business or logistics background. If you prefer finance, SAP FICO is the industry standard.",
+    keywordRef: ["which sap module is easy to learn"]
+  },
+  {
+    question: "How to learn SAP FICO, Fiori, ERP, and Delivery Processing?",
+    answer: "SAP ERP functional modules (like FICO for finance) are best learned by mapping business accounting transactions. For user experience, you should learn SAP Fiori UX design principles and annotation configurations. For logistics and delivery processing, study standard sales order structures and shipment transactions in the SAP GUI.",
+    keywordRef: ["how to learn sap fico", "how to learn sap fiori", "how to learn sap erp", "sap how to learn delivery processing"]
+  },
+  {
+    question: "What is SAP BTP and how do I start learning SAP Cloud development?",
+    answer: "SAP BTP (Business Technology Platform) is SAP's unified cloud environment for application development, process automation, integration, and analytics. Beginners can start learning BTP for free by setting up an SAP BTP Free Tier account, exploring the Cloud Application Programming (CAP) model, and learning Event Mesh messaging.",
+    keywordRef: ["what is sap btp", "how to learn sap btp", "sap btp tutorial free"]
+  },
+  {
+    question: "What is the difference between SAP ECC and SAP S/4HANA?",
+    answer: "SAP ECC is SAP's legacy ERP suite running on third-party databases. SAP S/4HANA is the next-generation ERP running exclusively on the high-speed SAP HANA in-memory database. S/4HANA introduces modern Fiori user interfaces, simplified data structures (like the Universal Journal ACDOCA), and native CDS views for real-time analytics.",
+    keywordRef: ["sap ecc vs s4hana", "difference between sap ecc and s4hana", "sap s4hana overview"]
+  }
+];
+
+// JSON-LD schema structure
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "name": "SAP Learning FAQ - Learn SAP Free",
+  "description": "Frequently asked questions about learning SAP, ABAP programming, SAP modules, and free training resources.",
+  "url": "https://learnsapfree.com/faq",
+  "mainEntity": faqs.map(faq => ({
+    "@type": "Question",
+    "name": faq.question,
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": faq.answer
+    }
+  }))
+};
+
+// JSON-LD: BreadcrumbList
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://learnsapfree.com"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "FAQ",
+      "item": "https://learnsapfree.com/faq"
+    }
+  ]
+};
+---
+
+<Layout 
+  title="SAP FAQ - How to Learn SAP for Free | Learn SAP Free" 
+  description="Get answers to the most common questions about how to learn SAP, ABAP programming, SAP modules, Fiori, HANA, and how to get started with free SAP training resources."
+  keywords={[
+    "how to learn sap", "learn sap free", "sap faq", "sap abap questions",
+    "how long to learn sap", "sap modules easy to learn", "sap training questions",
+    "learn sap online free", "sap for beginners faq", "sap fico learning"
+  ]}
+>
+  <!-- JSON-LD Schemas -->
+  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} slot="head" />
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} slot="head" />
+
+  <section class="bg-canvas py-[80px] min-h-[75vh] ">
+    <div class="max-w-[760px] mx-auto px-4">
+      
+      <!-- Breadcrumb Navigation -->
+      <nav aria-label="Breadcrumb" class="mb-6">
+        <ol class="flex items-center gap-1.5 font-caption text-[13px] text-ink-muted-48">
+          <li><a href="/" class="hover:text-primary transition-colors">Home</a></li>
+          <li><span class="mx-1">›</span></li>
+          <li class="text-ink font-semibold">FAQ</li>
+        </ol>
+      </nav>
+
+      <!-- Back Link -->
+      <a href="/" class="text-link font-caption-strong text-[14px] inline-flex items-center gap-1 mb-8 hover:text-primary-focus transition-colors">
+        <svg class="w-4 h-4 stroke-current fill-none stroke-[2]" viewBox="0 0 24 24">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Back to Dashboard
+      </a>
+
+      <!-- Page Header -->
+      <header class="border-b border-hairline pb-6 mb-12">
+        <span class="text-primary font-caption-strong text-[13px] uppercase tracking-wider block mb-2">Help Center</span>
+        <h1 class="font-display-lg text-[32px] md:text-[40px] text-ink leading-tight tracking-tight">Frequently Asked Questions</h1>
+        <p class="font-body-apple text-[16px] text-ink-muted-80 mt-2">
+          Find answers to the most common questions regarding SAP software, functional configurations, and technical developer paths.
+        </p>
+      </header>
+
+      <!-- Accordion List (Using standard HTML5 semantic details/summary) -->
+      <div class="flex flex-col gap-4">
+        {faqs.map(faq => (
+          <details class="faq-details group bg-canvas border border-hairline rounded-lg transition-all duration-200">
+            <summary class="faq-summary font-body-strong text-[16px] md:text-[17px] text-ink p-5 flex items-center justify-between cursor-pointer focus:outline-none list-none [&::-webkit-details-marker]:hidden">
+              <span>{faq.question}</span>
+              <span class="faq-icon text-primary transition-transform duration-200 group-open:rotate-180">
+                <svg class="w-4 h-4 stroke-current fill-none stroke-[2.5]" viewBox="0 0 24 24">
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </span>
+            </summary>
+            <div class="faq-content px-5 pb-5 text-ink-muted-80 font-body-apple text-[15px] leading-relaxed border-t border-hairline/40 pt-4">
+              <p>{faq.answer}</p>
+            </div>
+          </details>
+        ))}
+      </div>
+
+      <!-- Quick Contact Box -->
+      <div class="mt-12 bg-canvas-parchment rounded-lg border border-hairline p-8 text-center flex flex-col items-center gap-4">
+        <h3 class="font-body-strong text-[17px] text-ink">Still have questions?</h3>
+        <p class="font-caption text-[14px] text-ink-muted-80 max-w-[480px]">
+          If you didn't find the answer you were looking for, feel free to drop us an email or send a suggestion via our contact page.
+        </p>
+        <a href="/contact" class="button-primary text-[14px] font-semibold">
+          Contact Support
+        </a>
+      </div>
+
+    </div>
+  </section>
+</Layout>
+
+<style>
+  /* Customize summary focus styles and details transitions */
+  .faq-details {
+    overflow: hidden;
+  }
+  .faq-details[open] {
+    border-color: var(--color-primary);
+    box-shadow: 0 4px 12px rgba(0, 102, 204, 0.05);
+  }
+  .faq-summary:focus-visible {
+    background-color: var(--color-canvas-parchment);
+    outline: 2px solid var(--color-primary-focus);
+    outline-offset: -2px;
+  }
+</style>

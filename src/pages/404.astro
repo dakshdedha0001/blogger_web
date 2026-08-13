@@ -1,0 +1,50 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout 
+  title="Page Not Found - Learn SAP Free" 
+  description="The page you are looking for does not exist or has been moved."
+>
+  <section class="bg-canvas py-[120px] min-h-[70vh] flex items-center justify-center text-center">
+    <div class="max-w-[560px] mx-auto px-4 flex flex-col items-center">
+      
+      <!-- Indicator tag -->
+      <span class="text-ink-muted-48 font-caption-strong text-[14px] uppercase tracking-wider mb-4">
+        Error 404
+      </span>
+
+      <!-- Headline -->
+      <h1 class="font-hero-display text-[38px] md:text-[48px] text-ink mb-6 tracking-tight leading-none">
+        The page you’re looking for can’t be found.
+      </h1>
+
+      <!-- Lead copy -->
+      <p class="font-body-apple text-[16px] text-ink-muted-80 mb-10 leading-relaxed max-w-[440px]">
+        The link may be broken, or the page was moved to a new address. Try returning to the dashboard or explore our training tools below.
+      </p>
+
+      <!-- Action buttons -->
+      <div class="flex flex-col sm:flex-row items-center gap-4 mb-10 font-button-utility">
+        <a href="/" class="button-primary min-w-[160px]">
+          Go to Dashboard
+        </a>
+        <a href="/blog" class="button-secondary-pill min-w-[160px]">
+          Browse Blog
+        </a>
+      </div>
+
+      <!-- Quick Directory links -->
+      <div class="border-t border-hairline w-full pt-8 flex items-center justify-center gap-6 text-[13px] font-caption text-ink-muted-48">
+        <a href="/tcodes" class="hover:text-primary transition-colors">T-Codes</a>
+        <span class="text-hairline/60">|</span>
+        <a href="/quiz" class="hover:text-primary transition-colors">Quiz</a>
+        <span class="text-hairline/60">|</span>
+        <a href="/faq" class="hover:text-primary transition-colors">FAQ</a>
+        <span class="text-hairline/60">|</span>
+        <a href="/contact" class="hover:text-primary transition-colors">Contact</a>
+      </div>
+
+    </div>
+  </section>
+</Layout>

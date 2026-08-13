@@ -1,11 +1,719 @@
 ---
-import Welcome from '../components/Welcome.astro';
+// src/pages/index.astro
+import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
 import Layout from '../layouts/Layout.astro';
+import DailyTipCard from '../components/DailyTipCard.astro';
+import Quiz from '../components/Quiz.astro';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+// Fetch all blog posts and sort by learning order ascending
+const posts = await getCollection('blog');
+const sortedPosts = posts.sort((a, b) => {
+  const orderA = a.data.order ?? 999;
+  const orderB = b.data.order ?? 999;
+  if (orderA !== orderB) {
+    return orderA - orderB;
+  }
+  return b.data.pubDate.valueOf() - a.data.pubDate.valueOf();
+});
+
+// Helper for category classes (colored subtle borders)
+const getCategoryStyles = (category: string) => {
+  switch (category.toUpperCase()) {
+    case 'ABAP PROGRAMMING': return 'border-l-4 border-primary';
+    case 'DATA DICTIONARY': return 'border-l-4 border-indigo-500';
+    case 'ABAP': return 'border-l-4 border-primary';
+    case 'FIORI': return 'border-l-4 border-emerald-500';
+    case 'HANA': return 'border-l-4 border-amber-500';
+    case 'BTP': return 'border-l-4 border-indigo-500';
+    default: return 'border-l-4 border-purple-500';
+  }
+};
+
+const getCategoryBadgeStyles = (category: string) => {
+  switch (category.toUpperCase()) {
+    case 'ABAP PROGRAMMING': return 'bg-primary/5 text-primary border-primary/20';
+    case 'DATA DICTIONARY': return 'bg-indigo-500/5 text-indigo-600 border-indigo-500/20';
+    case 'ABAP': return 'bg-primary/5 text-primary border-primary/20';
+    case 'FIORI': return 'bg-emerald-500/5 text-emerald-600 border-emerald-500/20';
+    case 'HANA': return 'bg-amber-500/5 text-amber-600 border-amber-500/20';
+    case 'BTP': return 'bg-indigo-500/5 text-indigo-600 border-indigo-500/20';
+    default: return 'bg-purple-500/5 text-purple-600 border-purple-500/20';
+  }
+};
+
+// JSON-LD: WebSite schema with SearchAction (Google sitelinks search box)
+const websiteSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Learn SAP Free",
+  "url": "https://learnsapfree.com",
+  "description": "Free SAP training platform with tutorials on ABAP programming, SAP Fiori, HANA, BTP, and Basis administration.",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": {
+      "@type": "EntryPoint",
+      "urlTemplate": "https://learnsapfree.com/blog?search={search_term_string}"
+    },
+    "query-input": "required name=search_term_string"
+  }
+};
+
+// JSON-LD: ItemList for article grid (helps Google understand content catalog)
+const itemListSchema = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": "SAP Training Tutorials",
+  "description": "Comprehensive SAP training tutorials covering ABAP, Fiori, HANA, BTP, and more.",
+  "numberOfItems": sortedPosts.length,
+  "itemListElement": sortedPosts.slice(0, 10).map((post, index) => ({
+    "@type": "ListItem",
+    "position": index + 1,
+    "name": post.data.title,
+    "url": `https://learnsapfree.com/blog/${post.id}`
+  }))
+};
+
+// JSON-LD: VideoObject schema for index page featured video
+const videoSchema = {
+  "@context": "https://schema.org",
+  "@type": "VideoObject",
+  "name": "Structure in SAP ABAP - Learn SAP Free",
+  "description": "Step-by-step video tutorial explaining how structures work in SAP ABAP development.",
+  "thumbnailUrl": [
+    "https://img.youtube.com/vi/t9FmyzWfxsI/maxresdefault.jpg",
+    "https://img.youtube.com/vi/t9FmyzWfxsI/sddefault.jpg",
+    "https://img.youtube.com/vi/t9FmyzWfxsI/hqdefault.jpg"
+  ],
+  "uploadDate": "2026-05-16T00:00:00Z",
+  "embedUrl": "https://www.youtube.com/embed/t9FmyzWfxsI"
+};
 ---
 
-<Layout>
-	<Welcome />
+<Layout
+  title="Learn SAP Free - SAP ABAP, Fiori, HANA, BTP Tutorials & Training"
+  description="Learn SAP for free with step-by-step tutorials on ABAP programming, SAP Fiori UX, HANA database, BTP cloud platform, and Basis administration. Daily tips, transaction codes, quizzes, and hands-on guides."
+  keywords={[
+    "learn sap free", "sap abap tutorial", "sap fiori tutorial", "sap hana training",
+    "sap btp training", "sap training free", "sap abap programming", "sap online learning",
+    "how to learn sap", "sap for beginners", "learn sap online", "sap tutorial for beginners",
+    "sap abap for beginners", "sap fiori development", "sap transaction codes",
+    "sap quiz", "sap certification preparation", "sap career guide"
+  ]}
+>
+  <script type="application/ld+json" set:html={JSON.stringify(websiteSchema)} slot="head" />
+  <script type="application/ld+json" set:html={JSON.stringify(itemListSchema)} slot="head" />
+  <script type="application/ld+json" set:html={JSON.stringify(videoSchema)} slot="head" />
+
+
+  <!-- 1. Hero Section (Light Canvas) -->
+
+  <section class="bg-canvas py-[80px] border-b border-hairline overflow-hidden ">
+    <div class="max-w-[1024px] mx-auto px-4 md:px-[24px] grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+      
+      <!-- Left Column: Marketing Content -->
+      <div class="lg:col-span-6 flex flex-col items-center lg:items-start text-center lg:text-left">
+        <!-- Tagline -->
+        <span class="text-primary font-caption-strong text-[14px] uppercase tracking-wider mb-3 animate-fade-in">
+          Enterprise Micro-Learning Platform
+        </span>
+        
+        <!-- Headline -->
+        <h1 class="font-hero-display text-[44px] md:text-[56px] text-ink mb-6 tracking-tight">
+          Learn SAP Free.
+        </h1>
+        
+        <!-- Lead Subtitle -->
+        <p class="font-lead text-[18px] md:text-[24px] text-ink-muted-80 mb-8 max-w-[580px] leading-snug">
+          Master SAP ABAP, Fiori, HANA, BTP, and Basis through interactive, daily bite-sized lessons.
+        </p>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-wrap items-center justify-center lg:justify-start gap-4 mb-5 font-button-utility">
+          <a href="/blog" class="button-primary">
+            Explore Training Blog
+          </a>
+          <a href="/tcodes" class="button-secondary-pill">
+            Browse T-Codes
+          </a>
+        </div>
+
+        <!-- YouTube Subscription Button -->
+        <div class="mb-8">
+          <a 
+            href="https://www.youtube.com/channel/UCTivqSC8zUouAkk-YZEqnKg" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-2 px-5 py-2.5 bg-[#ff0000] hover:bg-[#cc0000] text-white rounded-full font-semibold text-[14px] transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-md cursor-pointer border-none"
+            aria-label="Subscribe to YouTube Channel"
+          >
+            <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+              <path d="M23.498 6.163a3.003 3.003 0 0 0-2.11-2.11C19.517 3.545 12 3.545 12 3.545s-7.517 0-9.388.508a3.003 3.003 0 0 0-2.11 2.11C0 8.033 0 12 0 12s0 3.967.502 5.837a3.003 3.003 0 0 0 2.11 2.11c1.871.508 9.388.508 9.388.508s7.517 0 9.388-.508a3.003 3.003 0 0 0 2.11-2.11C24 15.967 24 12 24 12s0-3.967-.502-5.837zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+            </svg>
+            Subscribe on YouTube
+          </a>
+        </div>
+
+        <!-- Quick Nav Links -->
+        <div class="flex items-center justify-center lg:justify-start gap-[12px] font-caption text-ink-muted-80 flex-wrap text-[13px]">
+          <a href="/blog" class="text-link font-semibold">Blog</a>
+          <span class="text-hairline">|</span>
+          <a href="/tcodes" class="text-link font-semibold">T-Codes</a>
+          <span class="text-hairline">|</span>
+          <a href="/quiz" class="text-link font-semibold">Quiz</a>
+          <span class="text-hairline">|</span>
+          <a href="/faq" class="text-link font-semibold">FAQ</a>
+          <span class="text-hairline">|</span>
+          <a href="/about" class="text-link font-semibold">About</a>
+        </div>
+      </div>
+
+      <!-- Right Column: Autoplay Video Player -->
+      <div class="lg:col-span-6 w-full flex flex-col items-center">
+        <div class="relative w-full max-w-[480px] bg-canvas-parchment rounded-lg border border-hairline p-3 shadow-product overflow-hidden">
+          <div class="aspect-video w-full rounded overflow-hidden bg-black relative">
+            <iframe 
+              class="absolute inset-0 w-full h-full border-none"
+              src="https://www.youtube.com/embed/t9FmyzWfxsI?autoplay=1&mute=1&loop=1&playlist=t9FmyzWfxsI&controls=1&modestbranding=1&rel=0" 
+              title="Learn SAP ABAP Video Tutorial"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+              allowfullscreen
+            ></iframe>
+          </div>
+          <div class="mt-3 flex items-center justify-between text-[12px] text-ink-muted-80 font-caption">
+            <span class="font-semibold text-primary flex items-center gap-1">
+              <span class="w-2 h-2 rounded-full bg-red-600 animate-pulse inline-block"></span>
+              Structure in SAP ABAP
+            </span>
+            <a 
+              href="https://www.youtube.com/channel/UCTivqSC8zUouAkk-YZEqnKg" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              class="text-link font-bold inline-flex items-center gap-1"
+            >
+              YouTube Button
+              <svg class="w-3 h-3 stroke-current fill-none stroke-[2]" viewBox="0 0 24 24">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </a>
+          </div>
+          <!-- Surface indicator grid line -->
+          <div class="absolute bottom-0 inset-x-0 h-[2px] bg-hairline"></div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Mobile Tabs Navigation (Sticky App Bar) -->
+  <div class="md:hidden sticky top-[96px] z-30 bg-canvas/90 backdrop-blur-md border-b border-hairline py-3 px-4 w-full">
+    <div class="flex items-center justify-around bg-canvas-parchment rounded-lg p-1 font-caption-strong text-[14px]">
+      <button 
+        class="flex-1 py-2 text-center rounded-md border-none cursor-pointer bg-canvas text-primary font-semibold shadow-sm transition-all focus:outline-none"
+        data-tab="challenge"
+      >
+        🎯 Daily
+      </button>
+      <button 
+        class="flex-1 py-2 text-center rounded-md border-none cursor-pointer bg-transparent text-ink-muted-80 transition-all focus:outline-none"
+        data-tab="tcode-dictionary"
+      >
+        🔍 T-Codes
+      </button>
+      <button 
+        class="flex-1 py-2 text-center rounded-md border-none cursor-pointer bg-transparent text-ink-muted-80 transition-all focus:outline-none"
+        data-tab="tips"
+      >
+        ✍️ Guides
+      </button>
+    </div>
+  </div>
+
+  <!-- 2. Daily Challenge Tile (Dark Canvas) -->
+  <section id="challenge" class="bg-surface-tile-1 text-body-on-dark py-[80px] scroll-mt-[52px] reveal">
+    <div class="max-w-[1024px] mx-auto px-4 md:px-[24px]">
+      <div class="text-center mb-[48px]">
+        <span class="text-primary-on-dark font-caption-strong text-[14px] uppercase tracking-wider mb-2">Today's Exercises</span>
+        <h2 class="font-display-lg text-[32px] md:text-[40px] tracking-tight">Interactive Daily Dashboard</h2>
+        <p class="font-body-apple text-[16px] text-body-muted max-w-[580px] mx-auto mt-2">
+          Hone your technical expertise. Reveal a practical SAP GUI shortcut or test your theory knowledge in our daily micro-quiz.
+        </p>
+      </div>
+
+      <!-- LMS Tracker Progress Bar (Dynamic via JS) -->
+      <div id="lms-progress-card" class="bg-white/5 rounded-lg border border-white/10 p-6 mb-[48px] max-w-[640px] mx-auto hidden flex-col gap-6 reveal">
+        <!-- Stats Row -->
+        <div class="flex flex-col md:flex-row items-center justify-between gap-6 w-full">
+          <div class="flex items-center gap-4 w-full md:w-auto">
+            <div class="w-12 h-12 rounded-full border-2 border-primary-on-dark flex items-center justify-center font-mono text-[14px] font-bold text-primary-on-dark shrink-0 transition-colors" id="lms-percentage">
+              0%
+            </div>
+            <div class="text-left">
+              <h3 class="font-body-strong text-[17px] text-body-on-dark">Your Learning Progress</h3>
+              <p class="font-caption text-[13px] text-body-muted" id="lms-desc">Complete quizzes to unlock your study badges!</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-6 w-full md:w-auto justify-between md:justify-end">
+            <div class="text-center">
+              <span class="block text-[20px] font-bold text-white font-mono" id="lms-completed-count">0</span>
+              <span class="block text-[11px] text-body-muted uppercase tracking-wider font-semibold">Completed</span>
+            </div>
+            <div class="h-8 w-[1px] bg-white/10 hidden md:block"></div>
+            <div class="text-center">
+              <span class="block text-[20px] font-bold text-white font-mono" id="lms-average-score">0%</span>
+              <span class="block text-[11px] text-body-muted uppercase tracking-wider font-semibold">Avg Score</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bookmarks Section -->
+        <div id="lms-bookmarks-section" class="hidden flex-col border-t border-white/10 pt-4 w-full text-left">
+          <span class="text-white/40 text-[10px] uppercase font-bold tracking-wider mb-3 block">Saved Guides & T-Codes</span>
+          <div id="lms-bookmarks-list" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <!-- Populated dynamically via JS -->
+          </div>
+        </div>
+      </div>
+
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-[32px]">
+        <!-- Left Column: Shortcut generator -->
+        <DailyTipCard />
+
+        <!-- Right Column: Micro-quiz -->
+        <Quiz />
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. T-Code Lookup Preview (Parchment Canvas) -->
+  <section id="tcode-dictionary" class="bg-canvas-parchment py-[80px] border-y border-hairline reveal">
+    <div class="max-w-[1024px] mx-auto px-4 md:px-[24px] grid grid-cols-1 lg:grid-cols-12 gap-[40px] items-center">
+      <div class="lg:col-span-7">
+        <span class="text-primary font-caption-strong text-[14px] uppercase tracking-wider mb-2 block">Instant Lookup</span>
+        <h2 class="font-display-lg text-ink text-[32px] md:text-[40px] tracking-tight mb-4">SAP T-Code Dictionary</h2>
+        <p class="font-body-apple text-[16px] text-ink-muted-80 max-w-[640px] leading-relaxed mb-6">
+          Use the dedicated dictionary page when you need quick SAP GUI shortcuts by module. The homepage now keeps this as a compact entry point so Google sees the training guides as the primary publisher content.
+        </p>
+        <a href="/tcodes" class="button-primary inline-flex items-center gap-2">
+          Browse T-Codes
+          <svg class="w-4 h-4 stroke-current fill-none stroke-[2]" viewBox="0 0 24 24" aria-hidden="true">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </a>
+      </div>
+
+      <div class="lg:col-span-5 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 gap-3" aria-label="Popular SAP transaction codes">
+        {[
+          ['SE11', 'ABAP Dictionary'],
+          ['SE38', 'ABAP Editor'],
+          ['SE80', 'Object Navigator'],
+          ['ST22', 'Dump Analysis'],
+          ['MIGO', 'Goods Movement'],
+          ['VA01', 'Sales Order'],
+        ].map(([code, label]) => (
+          <a href="/tcodes" class="bg-canvas border border-hairline rounded-lg p-4 hover:border-primary transition-colors">
+            <span class="block font-mono font-bold text-primary text-[20px]">{code}</span>
+            <span class="block font-caption text-[13px] text-ink-muted-80 mt-1">{label}</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Latest Articles Grid (Light Canvas) -->
+  <section id="tips" class="bg-canvas py-[80px] reveal">
+    <div class="max-w-[1024px] mx-auto px-4 md:px-[24px]">
+      <div class="text-center md:text-left mb-[48px]">
+        <span class="text-primary font-caption-strong text-[14px] uppercase tracking-wider mb-2 block">Developer Academy</span>
+        <h2 class="font-display-lg text-[32px] md:text-[40px] tracking-tight mb-2">Practical & Theory Training</h2>
+        <p class="font-body-apple text-[16px] text-ink-muted-80 max-w-[620px]">
+          Deep dive into comprehensive tutorials on modern SAP extensibility, database modeling, cloud integration, and systems configuration.
+        </p>
+      </div>
+
+      <!-- Articles Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[24px]">
+        {sortedPosts.map(post => (
+          <article class={`store-utility-card ${getCategoryStyles(post.data.category)} flex flex-col justify-between h-[440px] group cursor-pointer relative`}>
+            <div>
+              <!-- Thumbnail Image -->
+              {post.data.image && (
+                <div class="w-full h-[140px] overflow-hidden rounded-sm mb-4 border border-hairline/35 bg-canvas-parchment relative">
+                  <Image 
+                    src={post.data.image} 
+                    alt={post.data.title}
+                    width={400}
+                    height={140}
+                    class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                    loading="lazy"
+                  />
+                </div>
+              )}
+              
+              <!-- Category and Date -->
+              <div class="flex items-center justify-between mb-3">
+                <span class={`text-[10px] uppercase font-bold tracking-wider px-[8px] py-[3px] rounded-sm border ${getCategoryBadgeStyles(post.data.category)}`}>
+                  {post.data.category}
+                </span>
+                <span class="font-fine-print text-ink-muted-48 text-[11px]">
+                  {post.data.readingTime || '5 min read'}
+                </span>
+              </div>
+
+              <!-- Title -->
+              <h3 class="font-body-strong text-[17px] text-ink line-clamp-2 mb-2 leading-snug group-hover:text-primary transition-colors">
+                {post.data.title}
+              </h3>
+              
+              <!-- Description -->
+              <p class="font-caption text-[14px] text-ink-muted-80 line-clamp-3 leading-relaxed">
+                {post.data.description}
+              </p>
+            </div>
+
+            <div class="pt-4 border-t border-hairline flex items-center justify-between">
+              <span class="font-fine-print text-ink-muted-48">By {post.data.author}</span>
+              <a href={`/blog/${post.id}`} class="text-link font-caption-strong text-[14px] inline-flex items-center gap-1 hover:gap-2 transition-all after:absolute after:inset-0 after:z-10">
+                Read Guide 
+                <svg class="w-3.5 h-3.5 stroke-current fill-none stroke-[2]" viewBox="0 0 24 24">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </a>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- 4.1 YouTube Video Academy Section (Dark Canvas Tile) -->
+  <section id="youtube-academy" class="bg-surface-tile-1 text-body-on-dark py-[80px] border-t border-white/5 reveal">
+    <div class="max-w-[1024px] mx-auto px-4 md:px-[24px]">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-[48px] items-center">
+        
+        <!-- Left Column: Video Mockup Player -->
+        <div class="relative w-full max-w-[540px] mx-auto lg:mx-0 group cursor-pointer aspect-video rounded-lg overflow-hidden border border-white/10 bg-surface-black shadow-product">
+          <!-- Screenshot Thumbnail from PARAMETERS blog -->
+          <Image 
+            src="/abap-parameters-selection-screen.png" 
+            alt="SAP ABAP Video Tutorials Thumbnail"
+            width={540}
+            height={303}
+            class="w-full h-full object-cover opacity-80 group-hover:scale-[1.03] transition-transform duration-500"
+            loading="lazy"
+          />
+          
+          <!-- Play Button Overlay -->
+          <div class="absolute inset-0 flex items-center justify-center bg-surface-black/35 group-hover:bg-surface-black/25 transition-colors">
+            <a 
+              href="https://www.youtube.com/channel/UCTivqSC8zUouAkk-YZEqnKg" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              class="w-[64px] h-[64px] rounded-full bg-white/10 hover:bg-white/20 border border-white/30 backdrop-blur-md flex items-center justify-center text-white shadow-lg transition-all transform group-hover:scale-110 active:scale-95"
+              aria-label="Visit YouTube Channel"
+            >
+              <svg class="w-6 h-6 fill-current ml-1" viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z"></path>
+              </svg>
+            </a>
+          </div>
+          
+          <!-- Video duration badge -->
+          <span class="absolute bottom-3 right-3 font-fine-print text-[11px] bg-surface-black/75 px-2.5 py-0.5 rounded text-white border border-white/10">
+            VIDEO TUTORIALS
+          </span>
+        </div>
+
+        <!-- Right Column: Content and CTA -->
+        <div class="flex flex-col items-center lg:items-start text-center lg:text-left">
+          <!-- Subtitle Tag -->
+          <span class="text-primary-on-dark font-caption-strong text-[14px] uppercase tracking-wider mb-3 block">
+            SAP ABAP Video Academy
+          </span>
+          
+          <!-- Headline -->
+          <h2 class="font-display-lg text-[32px] md:text-[40px] text-body-on-dark mb-4 tracking-tight leading-tight">
+            Learn SAP on YouTube.
+          </h2>
+          
+          <!-- Description -->
+          <p class="font-body-apple text-[16px] text-body-muted mb-8 max-w-[480px] leading-relaxed">
+            Subscribe to get step-by-step video tutorials on SAP ABAP programming, transaction codes, structures, table maintenance generators, and database configurations. Build your skills with easy-to-follow visual walkthroughs.
+          </p>
+
+          <!-- CTA Button -->
+          <div>
+            <a 
+              href="https://www.youtube.com/channel/UCTivqSC8zUouAkk-YZEqnKg" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              class="button-primary inline-flex items-center gap-2"
+            >
+              <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                <path d="M23.498 6.163a3.003 3.003 0 0 0-2.11-2.11C19.517 3.545 12 3.545 12 3.545s-7.517 0-9.388.508a3.003 3.003 0 0 0-2.11 2.11C0 8.033 0 12 0 12s0 3.967.502 5.837a3.003 3.003 0 0 0 2.11 2.11c1.871.508 9.388.508 9.388.508s7.517 0 9.388-.508a3.003 3.003 0 0 0 2.11-2.11C24 15.967 24 12 24 12s0-3.967-.502-5.837zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+              </svg>
+              Subscribe on YouTube
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- 4.5 SEO Resource Guide Section (Parchment Tile) -->
+  <section id="learn-sap-guide" class="bg-canvas-parchment py-[80px] border-t border-hairline reveal">
+    <div class="max-w-[1024px] mx-auto px-4 md:px-[24px]">
+      <div class="max-w-[760px] mx-auto">
+        <!-- Subheading Tag -->
+        <span class="text-primary font-caption-strong text-[14px] uppercase tracking-wider mb-3 block">
+          Comprehensive SAP Training Hub
+        </span>
+        
+        <!-- Section Header -->
+        <h2 class="font-display-lg text-[32px] md:text-[40px] text-ink mb-8 tracking-tight">
+          How to Learn SAP: The Ultimate Free Resource Guide
+        </h2>
+
+        <!-- Rich Text SEO Article -->
+        <div class="rich-text text-ink-muted-80">
+          <p>
+            When I first started my journey with enterprise systems, I felt completely overwhelmed. The documentation was dense, access to sandbox servers was expensive, and everything seemed locked behind institutional training academies costing thousands of dollars. That is exactly why I built this platform. I wanted to create a welcoming space where developers and business professionals can learn the core concepts of SAP for free, using practical daily tips, interactive quizzes, and transaction code lookup tools.
+          </p>
+
+          <h3>Understanding the SAP Ecosystem</h3>
+          <p>
+            SAP is the world's leading enterprise resource planning (ERP) system, powering the business operations of the vast majority of Fortune 500 companies. To start learning, you first need to understand the distinction between functional business modules and technical development platforms. If you are new to the ecosystem, it is best to start by mastering basic navigation inside the SAP GUI. From there, you can choose a specialized functional path like procurement, materials management, or finance, where you manage physical and financial workflows.
+          </p>
+
+          <h3>How Long Does It Take to Get Comfortable?</h3>
+          <p>
+            This is a question I get asked a lot by juniors: how long will it take me to learn this? The honest answer is that it depends on your focus. Learning basic data entry or navigation can take less than two weeks of practice. However, if you want to master configuration, build database tables, or design corporate consolidation models in modules like BPC, you should expect to spend three to six months of daily practice. The secret is consistency—focus on daily, bite-sized tasks rather than reading thousands of pages of legacy manuals all at once.
+          </p>
+
+          <h3>The Technical Route: ABAP Development</h3>
+          <p>
+            For software developers, the absolute best entry point is ABAP (Advanced Business Application Programming). When you begin learning ABAP, you will study how data elements, domains, and database tables interact in the ABAP Dictionary. To get started with us, you do not need access to an expensive dedicated server—you can build your conceptual foundations by practicing basic syntax and structures through our sandbox challenge guides. Once you master the core rules, you can design high-performance reports, build database objects, and construct user interfaces.
+          </p>
+
+          <h3>Modern Cloud Architectures: HANA, BTP, and Fiori</h3>
+          <p>
+            The enterprise technology space is changing rapidly. While traditional ABAP development is still the baseline, modern cloud configurations are a must-know. Today, developers look toward SAP HANA, which is a high-speed, in-memory database, and SAP BTP (Business Technology Platform) to build side-by-side extension services. These systems allow you to write clean services using Node.js or Java, keeping the core ERP system untouched, while using SAP Fiori to deliver clean, responsive user interfaces.
+          </p>
+
+          <h3>Functional Specialties: Ariba and BPC</h3>
+          <p>
+            If your background is in business, finance, or supply chain management, functional roles offer fantastic career opportunities. You can specialize in SAP Ariba to manage procurement networks and supplier workflows, or dive into Business Planning and Consolidation (BPC) to master financial forecasting and budgeting. Each of these functional areas relies on its own set of standard transactions and configuration paths, which you can browse and study inside our lookup guides.
+          </p>
+
+          <h3>Accessing Quality Free Training</h3>
+          <p>
+            You do not need a massive corporate budget to learn these skills. You can build a solid foundation by leveraging free resources like the official SAP Help Portal, community developer tutorials, and standard training forums. Our goal here is to bridge the gap between abstract theory and hands-on practice. By spending just 10-15 minutes a day reviewing transaction codes, testing your knowledge with our quizzes, and reading micro-learning guides, you will build the skills needed to design, develop, and maintain enterprise software.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. Mission Editorial Section (Dark Canvas Tile 2) -->
+  <section id="about" class="bg-surface-tile-2 text-body-on-dark py-[80px] border-t border-white/5 reveal">
+    <div class="max-w-[800px] mx-auto px-4 md:px-[24px] text-center">
+      <div class="w-[48px] h-[48px] bg-white/5 rounded-full flex items-center justify-center border border-white/10 mx-auto mb-6">
+        <svg class="w-5 h-5 text-primary-on-dark fill-none stroke-current stroke-[2]" viewBox="0 0 24 24">
+          <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+        </svg>
+      </div>
+      <h2 class="font-display-lg text-[28px] md:text-[34px] tracking-tight mb-6">Simplifying Enterprise Tech</h2>
+      <p class="font-lead-airy text-[18px] md:text-[22px] text-body-muted mb-8 leading-relaxed">
+        "SAP systems are core to global commerce, yet learning them remains siloed behind heavy manuals and legacy interfaces. We started Learn SAP Free to make SAP training actionable, responsive, and aesthetically engaging."
+      </p>
+      <div class="h-[1px] bg-white/10 w-24 mx-auto mb-6"></div>
+      <span class="font-fine-print text-body-muted text-[13px]">
+        Learn SAP Free Community &middot; Dedicated to Practical & Theoretical Excellence
+      </span>
+    </div>
+  </section>
+
+  <!-- LMS Progress Dashboard Client Script -->
+  <script>
+    const updateLmsTracker = () => {
+      const card = document.getElementById('lms-progress-card');
+      const pct = document.getElementById('lms-percentage');
+      const count = document.getElementById('lms-completed-count');
+      const avg = document.getElementById('lms-average-score');
+      const desc = document.getElementById('lms-desc');
+      const bookmarksSection = document.getElementById('lms-bookmarks-section');
+      const bookmarksList = document.getElementById('lms-bookmarks-list');
+
+      if (!card || !pct || !count || !avg || !desc) return;
+
+      try {
+        const data = JSON.parse(localStorage.getItem('sap_quiz_progress') || '{}');
+        const keys = Object.keys(data);
+        const totalQuizzes = keys.length;
+
+        const bookmarks = JSON.parse(localStorage.getItem('sap_bookmarks') || '{}');
+        const bKeys = Object.keys(bookmarks);
+
+        if (totalQuizzes === 0 && bKeys.length === 0) {
+          card.classList.add('hidden');
+          card.classList.remove('flex');
+          return;
+        }
+
+        // We have completed quizzes or bookmarks! Show card
+        card.classList.remove('hidden');
+        card.classList.add('flex');
+
+        let totalScore = 0;
+        let totalQuestions = 0;
+
+        keys.forEach(key => {
+          totalScore += data[key].score;
+          totalQuestions += data[key].total;
+        });
+
+        const avgPercent = totalQuestions > 0 ? Math.round((totalScore / totalQuestions) * 100) : 0;
+
+        // Custom gamified learning badges
+        let badgeName = "SAP Novice";
+        if (totalQuizzes >= 8) badgeName = "SAP Architect";
+        else if (totalQuizzes >= 5) badgeName = "SAP Consultant";
+        else if (totalQuizzes >= 3) badgeName = "ABAP Professional";
+        else if (totalQuizzes >= 1) badgeName = "SAP Developer";
+
+        count.textContent = totalQuizzes.toString();
+        avg.textContent = `${avgPercent}%`;
+        pct.textContent = `${avgPercent}%`;
+        desc.textContent = `Current Badge: ${badgeName}. Keep leveling up!`;
+
+        // Style borders based on stats
+        if (avgPercent >= 90) {
+          pct.classList.add('border-green-500', 'text-green-500');
+          pct.classList.remove('border-primary-on-dark', 'text-primary-on-dark');
+        } else {
+          pct.classList.remove('border-green-500', 'text-green-500');
+          pct.classList.add('border-primary-on-dark', 'text-primary-on-dark');
+        }
+
+        // Render bookmarks list
+        if (bookmarksSection && bookmarksList) {
+          if (bKeys.length > 0) {
+            bookmarksSection.classList.remove('hidden');
+            bookmarksSection.classList.add('flex');
+            bookmarksList.innerHTML = bKeys.map(key => {
+              const b = bookmarks[key];
+              const isTCode = key.startsWith('tcode-');
+              const isLine = key.startsWith('line-');
+              
+              let label = 'Guide';
+              let badgeColor = 'bg-primary/10 text-primary-on-dark border-primary/20';
+
+              if (isTCode) {
+                label = 'T-Code';
+                badgeColor = 'bg-amber-500/10 text-amber-500 border-amber-500/25';
+              } else if (isLine) {
+                label = 'Snippet';
+                badgeColor = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/25';
+              }
+
+              return `
+                <a href="${b.url}" class="flex flex-col p-3 rounded-md bg-white/5 border border-white/10 hover:border-primary-on-dark hover:bg-white/10 transition-all group">
+                  <span class="text-[9px] uppercase font-bold tracking-wider border max-w-fit px-1.5 py-0.5 rounded-sm ${badgeColor} mb-1.5">${label} &middot; ${b.category}</span>
+                  <span class="font-body-strong text-[14px] text-white line-clamp-1 leading-tight group-hover:text-primary-on-dark transition-colors">${b.title}</span>
+                </a>
+              `;
+            }).join('');
+          } else {
+            bookmarksSection.classList.add('hidden');
+            bookmarksSection.classList.remove('flex');
+            bookmarksList.innerHTML = '';
+          }
+        }
+
+      } catch (e) {
+        console.error("LMS tracker load error: ", e);
+      }
+    };
+
+    // Run on initial load
+    updateLmsTracker();
+
+    // Listen to quiz completions and bookmarks updates
+    window.addEventListener('sap-quiz-updated', updateLmsTracker);
+    window.addEventListener('sap-bookmarks-updated', updateLmsTracker);
+    document.addEventListener('astro:after-swap', updateLmsTracker);
+
+    // Mobile Tabs Navigation Switching Logic
+    const setupMobileTabs = () => {
+      const isMobile = window.innerWidth < 768; // md breakpoint is 768px
+      const tabButtons = document.querySelectorAll('[data-tab]');
+      const sectionChallenge = document.getElementById('challenge');
+      const sectionTCodes = document.getElementById('tcode-dictionary');
+      const sectionTips = document.getElementById('tips');
+
+      if (!sectionChallenge || !sectionTCodes || !sectionTips) return;
+
+      if (!isMobile) {
+        // Desktop: make all sections visible
+        sectionChallenge.classList.remove('hidden');
+        sectionTCodes.classList.remove('hidden');
+        sectionTips.classList.remove('hidden');
+        return;
+      }
+
+      // Mobile active switching logic
+      const switchTab = (tabId: string) => {
+        // Hide all
+        sectionChallenge.classList.add('hidden');
+        sectionTCodes.classList.add('hidden');
+        sectionTips.classList.add('hidden');
+
+        // Unhide selected
+        const activeSection = document.getElementById(tabId);
+        if (activeSection) {
+          activeSection.classList.remove('hidden');
+        }
+
+        // Toggle active styling on tab buttons
+        tabButtons.forEach(btn => {
+          const b = btn as HTMLButtonElement;
+          const target = b.getAttribute('data-tab');
+          if (target === tabId) {
+            b.classList.add('bg-canvas', 'text-primary', 'font-semibold', 'shadow-sm');
+            b.classList.remove('bg-transparent', 'text-ink-muted-80');
+          } else {
+            b.classList.remove('bg-canvas', 'text-primary', 'font-semibold', 'shadow-sm');
+            b.classList.add('bg-transparent', 'text-ink-muted-80');
+          }
+        });
+      };
+
+      // Register click triggers
+      tabButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const targetTab = btn.getAttribute('data-tab') || "challenge";
+          switchTab(targetTab);
+          
+          // Smooth scroll to the top of the tabs bar to align view
+          const tabsBar = document.querySelector('[data-tab]')?.parentElement?.parentElement;
+          if (tabsBar) {
+            tabsBar.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        });
+      });
+
+      // Default load state: show challenge (Daily tip/quiz)
+      switchTab('challenge');
+    };
+
+    // Run tab initialization
+    setupMobileTabs();
+    window.addEventListener('resize', setupMobileTabs);
+    document.addEventListener('astro:after-swap', setupMobileTabs);
+  </script>
 </Layout>

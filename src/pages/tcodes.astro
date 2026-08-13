@@ -1,0 +1,119 @@
+---
+// src/pages/tcodes.astro
+import Layout from '../layouts/Layout.astro';
+import TCodeLookup from '../components/TCodeLookup.astro';
+import { TCODES } from '../data/tcodes.ts';
+
+// Top essential T-Codes for static indexable table
+const featuredTCodes = TCODES.slice(0, 15);
+
+const tcodesPageSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "SAP Transaction Codes (T-Codes) Reference Dictionary",
+  "description": "Comprehensive reference guide and search lookup for SAP transaction codes across ABAP, Basis, MM, SD, FICO, and HANA.",
+  "url": "https://learnsapfree.com/tcodes"
+};
+
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://learnsapfree.com"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "T-Codes",
+      "item": "https://learnsapfree.com/tcodes"
+    }
+  ]
+};
+---
+
+<Layout 
+  title="SAP T-Code Dictionary — Essential Transaction Codes Reference" 
+  description="Search and discover essential SAP transaction codes (T-Codes) for ABAP developers, Basis administrators, MM, SD, and FICO consultants."
+  keywords={[
+    "sap tcodes", "sap transaction codes list", "se11 tcode in sap", "abap tcodes",
+    "sap basis tcodes", "sap mm transaction codes", "sap fico transaction codes"
+  ]}
+>
+  <script type="application/ld+json" set:html={JSON.stringify(tcodesPageSchema)} slot="head" />
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} slot="head" />
+
+  <section class="bg-canvas py-[64px] min-h-[60vh]">
+    <div class="max-w-[1024px] mx-auto px-4 md:px-[24px]">
+      
+      <!-- Breadcrumb Navigation -->
+      <nav aria-label="Breadcrumb" class="mb-6">
+        <ol class="flex items-center gap-1.5 font-caption text-[13px] text-ink-muted-48">
+          <li><a href="/" class="hover:text-primary transition-colors">Home</a></li>
+          <li><span class="mx-1">›</span></li>
+          <li class="text-ink font-semibold">T-Codes</li>
+        </ol>
+      </nav>
+
+      <!-- Back Link -->
+      <a href="/" class="text-link font-caption-strong text-[14px] inline-flex items-center gap-1 mb-8 hover:text-primary-focus transition-colors">
+        <svg class="w-4 h-4 stroke-current fill-none stroke-[2]" viewBox="0 0 24 24">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Back to Dashboard
+      </a>
+
+      <!-- Main Search Box -->
+      <TCodeLookup />
+
+      <!-- Static SEO Indexable Content Section -->
+      <div class="mt-12 pt-8 border-t border-hairline">
+        <h2 class="font-display-lg text-[24px] text-ink tracking-tight mb-3">
+          Essential SAP Transaction Codes Quick Reference
+        </h2>
+        <p class="font-body-apple text-[15px] text-ink-muted-80 max-w-[760px] leading-relaxed mb-6">
+          In SAP ERP systems, <strong>Transaction Codes (T-Codes)</strong> are shortcuts used to launch specific tasks, system monitors, and development editors directly from the SAP GUI command field. Below is a list of the most essential T-Codes used daily by developers, functional consultants, and Basis administrators.
+        </p>
+
+        <!-- Static Table for Web Crawlers and SEO -->
+        <div class="overflow-x-auto rounded-lg border border-hairline bg-canvas-parchment">
+          <table class="w-full text-left font-caption text-[14px]">
+            <thead class="bg-canvas border-b border-hairline text-ink font-caption-strong uppercase tracking-wider text-[12px]">
+              <tr>
+                <th class="py-3 px-4">T-Code</th>
+                <th class="py-3 px-4">Module</th>
+                <th class="py-3 px-4">Description</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              {featuredTCodes.map(tc => (
+                <tr class="hover:bg-canvas/50 transition-colors">
+                  <td class="py-3 px-4 font-mono font-bold text-primary">{tc.code}</td>
+                  <td class="py-3 px-4">
+                    <span class="text-[11px] font-semibold px-2 py-0.5 rounded bg-primary/5 text-primary border border-primary/20 uppercase">
+                      {tc.module}
+                    </span>
+                  </td>
+                  <td class="py-3 px-4 text-ink-muted-80">
+                    <strong class="text-ink">{tc.desc}</strong> — {tc.summary}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="mt-6 text-center">
+          <p class="font-caption text-[13px] text-ink-muted-48">
+            Use the search box above to instantly filter through all {TCODES.length}+ SAP Transaction Codes.
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+</Layout>

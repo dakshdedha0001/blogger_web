@@ -1,0 +1,46 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout 
+  title="Server Error - Learn SAP Free" 
+  description="An unexpected error occurred. Our team has been notified."
+>
+  <section class="bg-canvas py-[120px] min-h-[70vh] flex items-center justify-center text-center">
+    <div class="max-w-[560px] mx-auto px-4 flex flex-col items-center">
+      
+      <!-- Indicator tag -->
+      <span class="text-ink-muted-48 font-caption-strong text-[14px] uppercase tracking-wider mb-4">
+        Error 500
+      </span>
+
+      <!-- Headline -->
+      <h1 class="font-hero-display text-[38px] md:text-[48px] text-ink mb-6 tracking-tight leading-none">
+        An unexpected error occurred.
+      </h1>
+
+      <!-- Lead copy -->
+      <p class="font-body-apple text-[16px] text-ink-muted-80 mb-10 leading-relaxed max-w-[440px]">
+        The server encountered a configuration issue or is temporarily overloaded. Please try reloading the page, or return to the main dashboard.
+      </p>
+
+      <!-- Action buttons -->
+      <div class="flex flex-col sm:flex-row items-center gap-4 mb-10 font-button-utility">
+        <button onclick="window.location.reload()" class="button-primary min-w-[160px]">
+          Reload Page
+        </button>
+        <a href="/" class="button-secondary-pill min-w-[160px]">
+          Back to Home
+        </a>
+      </div>
+
+      <!-- Quick Directory links -->
+      <div class="border-t border-hairline w-full pt-8 flex items-center justify-center gap-6 text-[13px] font-caption text-ink-muted-48">
+        <a href="/faq" class="hover:text-primary transition-colors">FAQ</a>
+        <span class="text-hairline/60">|</span>
+        <a href="/contact" class="hover:text-primary transition-colors">Contact Support</a>
+      </div>
+
+    </div>
+  </section>
+</Layout>

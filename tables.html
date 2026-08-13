@@ -1,0 +1,503 @@
+<table align="center" cellpadding="0" cellspacing="0" class="tr-caption-container"
+    style="margin-left: auto; margin-right: auto;">
+    <tbody>
+        <tr>
+            <td style="text-align: center;"><a
+                    href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEitI82W5ugjgTQYpGHlk5L9iTb6-t9t0Yjf07ZUMhMlqXHiHaIS6ZByFIImQaXywvWhIwVDXFl6xYyYl0Y6UNpbPxxsZn2Y9Two0baGufCI-b0nvcgBdqkCj2dIUwdKZUZfuUONMdorJXCvauKNrIXN8_GFB5JFlbgcqwPm0tMHcpyZPEss1TWHUu7UiDTF/s1536/front%20onefor%20table.png"
+                    style="margin-left: auto; margin-right: auto;"><img border="0" data-original-height="1024"
+                        data-original-width="1536" height="352"
+                        src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEitI82W5ugjgTQYpGHlk5L9iTb6-t9t0Yjf07ZUMhMlqXHiHaIS6ZByFIImQaXywvWhIwVDXFl6xYyYl0Y6UNpbPxxsZn2Y9Two0baGufCI-b0nvcgBdqkCj2dIUwdKZUZfuUONMdorJXCvauKNrIXN8_GFB5JFlbgcqwPm0tMHcpyZPEss1TWHUu7UiDTF/w529-h352/front%20onefor%20table.png"
+                        width="529" /></a></td>
+        </tr>
+        <tr>
+            <td class="tr-caption" style="text-align: center;"></td>
+        </tr>
+    </tbody>
+</table><br />
+<h1
+    style="color: #0d2b55; font-family: Georgia, serif; font-size: 2.2em; font-weight: 800; line-height: 1.3; margin: 0px 0px 8px;">
+    <br /></h1>
+<h1
+    style="color: #0d2b55; font-family: Georgia, serif; font-size: 2.2em; font-weight: 800; line-height: 1.3; margin: 0px 0px 8px;">
+    <br /></h1>
+<h1
+    style="color: #0d2b55; font-family: Georgia, serif; font-size: 2.2em; font-weight: 800; line-height: 1.3; margin: 0px 0px 8px;">
+    How to Create Tables in SAP ABAP: A Beginner's Step-by-Step Guide</h1>
+
+<p
+    style="color: #444444; font-family: &quot;Segoe UI&quot;, Arial, sans-serif; font-size: 1.05em; line-height: 1.8; margin: 0px 0px 32px;">
+    In SAP ABAP, tables are used to store and organize data inside the SAP database. Almost every SAP application relies
+    on tables to manage information such as employee records, customer details, sales orders, and product data.</p>
+
+<!--What is a Table-->
+<div
+    style="background: rgb(255, 255, 255); border-radius: 10px; border: 1px solid rgb(221, 230, 240); box-shadow: rgba(13, 43, 85, 0.06) 0px 2px 8px; margin-bottom: 28px; padding: 28px 30px;">
+    <h2
+        style="border-left: 5px solid rgb(21, 101, 192); color: #0d2b55; font-family: Georgia, serif; font-size: 1.5em; margin: 0px 0px 16px; padding-left: 14px;">
+        What is a Table in SAP ABAP?</h2>
+    <p
+        style="color: #444444; font-family: &quot;Segoe UI&quot;, Arial, sans-serif; font-size: 1em; line-height: 1.8; margin: 0px 0px 14px;">
+        A table in SAP ABAP is a database object used to store structured data. Each table consists of:</p>
+    <ul
+        style="color: #333333; font-family: &quot;Segoe UI&quot;, Arial, sans-serif; font-size: 1em; line-height: 2; margin: 0px 0px 20px; padding-left: 22px;">
+        <li>Fields (Columns)</li>
+        <li>Records (Rows)</li>
+        <li>Primary Keys</li>
+        <li>Data Types</li>
+    </ul>
+
+    <div style="margin-bottom: 18px; overflow-x: auto;">
+        <table
+            style="border-collapse: collapse; font-family: &quot;Segoe UI&quot;, Arial, sans-serif; font-size: 0.95em; width: 100%;">
+            <thead>
+                <tr style="background: rgb(21, 101, 192); color: white;">
+                    <th style="border: 1px solid rgb(18, 85, 168); padding: 11px 16px; text-align: left;">Student ID
+                    </th>
+                    <th style="border: 1px solid rgb(18, 85, 168); padding: 11px 16px; text-align: left;">Name</th>
+                    <th style="border: 1px solid rgb(18, 85, 168); padding: 11px 16px; text-align: left;">Course</th>
+                    <th style="border: 1px solid rgb(18, 85, 168); padding: 11px 16px; text-align: left;">Age</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="background: rgb(244, 248, 255);">
+                    <td style="border: 1px solid rgb(221, 230, 240); padding: 10px 16px;">101</td>
+                    <td style="border: 1px solid rgb(221, 230, 240); padding: 10px 16px;">Rahul</td>
+                    <td style="border: 1px solid rgb(221, 230, 240); padding: 10px 16px;">Computer Science</td>
+                    <td style="border: 1px solid rgb(221, 230, 240); padding: 10px 16px;">21</td>
+                </tr>
+                <tr style="background: rgb(255, 255, 255);">
+                    <td style="border: 1px solid rgb(221, 230, 240); padding: 10px 16px;">102</td>
+                    <td style="border: 1px solid rgb(221, 230, 240); padding: 10px 16px;">Abhishek</td>
+                    <td style="border: 1px solid rgb(221, 230, 240); padding: 10px 16px;">Information Technology</td>
+                    <td style="border: 1px solid rgb(221, 230, 240); padding: 10px 16px;">22</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <ul
+        style="color: #333333; font-family: &quot;Segoe UI&quot;, Arial, sans-serif; font-size: 1em; line-height: 2; margin: 0px 0px 16px; padding-left: 22px;">
+        <li>It is a collection of rows and columns.</li>
+        <li>Tables are containers which store data in the form of records.</li>
+        <li>Tables must have a primary key which is used to identify a record uniquely.</li>
+    </ul>
+
+    <!--Note box-->
+    <div
+        style="background: rgb(227, 240, 255); border-left: 5px solid rgb(21, 101, 192); border-radius: 6px; color: #0d2b55; font-family: &quot;Segoe UI&quot;, Arial, sans-serif; font-size: 0.97em; padding: 14px 18px;">
+        <strong> Note:</strong> The transaction code for creating a table is <span
+            style="background: rgb(13, 43, 85); border-radius: 4px; color: white; font-family: monospace; font-size: 0.97em; padding: 2px 8px;">SE11</span>
+    </div>
+</div>
+
+<!--Why Custom Tables-->
+<div
+    style="background: rgb(255, 255, 255); border-radius: 10px; border: 1px solid rgb(221, 230, 240); box-shadow: rgba(13, 43, 85, 0.06) 0px 2px 8px; margin-bottom: 28px; padding: 28px 30px;">
+    <h2
+        style="border-left: 5px solid rgb(21, 101, 192); color: #0d2b55; font-family: Georgia, serif; font-size: 1.5em; margin: 0px 0px 16px; padding-left: 14px;">
+        Why Do We Create Custom Tables?</h2>
+    <p
+        style="color: #444444; font-family: &quot;Segoe UI&quot;, Arial, sans-serif; font-size: 1em; line-height: 1.8; margin: 0px 0px 14px;">
+        SAP provides thousands of standard tables. However, organizations often have unique business requirements that
+        cannot be fulfilled using standard tables alone.</p>
+    <p
+        style="color: #444444; font-family: &quot;Segoe UI&quot;, Arial, sans-serif; font-size: 1em; line-height: 1.8; margin: 0px 0px 14px;">
+        Custom tables allow developers to:</p>
+    <ul
+        style="color: #333333; font-family: &quot;Segoe UI&quot;, Arial, sans-serif; font-size: 1em; line-height: 2; margin: 0px 0px 18px; padding-left: 22px;">
+        <li>Store company-specific information</li>
+        <li>Maintain custom application data</li>
+        <li>Create custom reports</li>
+        <li>Support business processes</li>
+        <li>Build industry-specific solutions</li>
+    </ul>
+    <div
+        style="background: rgb(227, 240, 255); border-left: 5px solid rgb(21, 101, 192); border-radius: 6px; color: #0d2b55; font-family: &quot;Segoe UI&quot;, Arial, sans-serif; font-size: 0.97em; padding: 14px 18px;">
+        <strong> Note:</strong> Custom table names should start with <strong>Z</strong> or <strong>Y</strong>.<br />
+        Example: <span
+            style="background: rgb(13, 43, 85); border-radius: 4px; color: white; font-family: monospace; font-size: 0.97em; padding: 2px 8px;">ZEMPLOYEE_TABLE</span>
+    </div>
+</div>
+
+<!--Important Components-->
+<div
+    style="background: rgb(255, 255, 255); border-radius: 10px; border: 1px solid rgb(221, 230, 240); box-shadow: rgba(13, 43, 85, 0.06) 0px 2px 8px; margin-bottom: 28px; padding: 28px 30px;">
+    <h2
+        style="border-left: 5px solid rgb(21, 101, 192); color: #0d2b55; font-family: Georgia, serif; font-size: 1.5em; margin: 0px 0px 20px; padding-left: 14px;">
+        Important Components Required Before Creating a Table</h2>
+    <p
+        style="color: #444444; font-family: &quot;Segoe UI&quot;, Arial, sans-serif; font-size: 1em; line-height: 1.8; margin: 0px 0px 18px;">
+        There are 3 main components you should know before creating a table:</p>
+
+    <!--Domain-->
+    <div
+        style="background: rgb(244, 248, 255); border-radius: 8px; border: 1px solid rgb(184, 208, 240); margin-bottom: 16px; padding: 18px 20px;">
+        <h3
+            style="color: #1565c0; font-family: &quot;Segoe UI&quot;, Arial, sans-serif; font-size: 1.1em; margin: 0px 0px 8px;">
+            1. Domain</h3>
+        <p
+            style="color: #333333; font-family: &quot;Segoe UI&quot;, Arial, sans-serif; font-size: 0.97em; line-height: 1.7; margin: 0px 0px 8px;">
+            A Domain defines the <strong>Data Type</strong>, <strong>Length</strong>, and <strong>Value Range</strong>
+            for a field.</p>
+        <p
+            style="color: #555555; font-family: &quot;Segoe UI&quot;, Arial, sans-serif; font-size: 0.93em; margin: 0px;">
+            Example: <span
+                style="background: rgb(13, 43, 85); border-radius: 4px; color: white; font-family: monospace; padding: 2px 8px;">Char(40)</span>
+        </p>
+    </div>
+
+    <!--Data Element-->
+    <div
+        style="background: rgb(244, 248, 255); border-radius: 8px; border: 1px solid rgb(184, 208, 240); margin-bottom: 16px; padding: 18px 20px;">
+        <h3
+            style="color: #1565c0; font-family: &quot;Segoe UI&quot;, Arial, sans-serif; font-size: 1.1em; margin: 0px 0px 8px;">
+            2. Data Element</h3>
+        <p
+            style="color: #333333; font-family: &quot;Segoe UI&quot;, Arial, sans-serif; font-size: 0.97em; line-height: 1.7; margin: 0px 0px 8px;">
+            A Data Element provides <strong>Field Labels</strong> used throughout the SAP system.</p>
+        <p
+            style="color: #555555; font-family: &quot;Segoe UI&quot;, Arial, sans-serif; font-size: 0.93em; margin: 0px;">
+            Example: <span
+                style="background: rgb(13, 43, 85); border-radius: 4px; color: white; font-family: monospace; padding: 2px 8px;">ZDE_EMPLOYEE_NAME</span>
+        </p>
+    </div>
+
+    <!--Primary Key-->
+    <div
+        style="background: rgb(244, 248, 255); border-radius: 8px; border: 1px solid rgb(184, 208, 240); margin-bottom: 0px; padding: 18px 20px;">
+        <h3
+            style="color: #1565c0; font-family: &quot;Segoe UI&quot;, Arial, sans-serif; font-size: 1.1em; margin: 0px 0px 8px;">
+            3. Primary Key</h3>
+        <ul
+            style="color: #333333; font-family: &quot;Segoe UI&quot;, Arial, sans-serif; font-size: 0.97em; line-height: 1.9; margin: 0px; padding-left: 20px;">
+            <li>A primary key uniquely identifies each record.</li>
+            <li>Example: <strong>Employee ID</strong> is the primary key.</li>
+            <li>Primary keys prevent duplicate records.</li>
+        </ul>
+    </div>
+</div>
+
+<!--Step by Step-->
+<div
+    style="background: rgb(255, 255, 255); border-radius: 10px; border: 1px solid rgb(221, 230, 240); box-shadow: rgba(13, 43, 85, 0.06) 0px 2px 8px; margin-bottom: 28px; padding: 28px 30px;">
+    <h2
+        style="border-left: 5px solid rgb(21, 101, 192); color: #0d2b55; font-family: Georgia, serif; font-size: 1.5em; margin: 0px 0px 20px; padding-left: 14px;">
+        Step-by-Step Process to Create a Table in SAP ABAP</h2>
+
+    <ol
+        style="color: #333333; font-family: &quot;Segoe UI&quot;, Arial, sans-serif; font-size: 1em; line-height: 2; margin: 0px 0px 20px; padding-left: 22px;">
+        <li>Login into SAP GUI using your username and password.</li>
+        <li>In the command field, enter Tcode <span
+                style="background: rgb(13, 43, 85); border-radius: 4px; color: white; font-family: monospace; padding: 1px 7px;">SE11</span>.
+        </li>
+        <li>Press <strong>Enter</strong>. The ABAP Dictionary screen will open.</li>
+        <li>On the initial screen, select the <strong>Database Table</strong> radio button.</li>
+        <li>Give a name for the table, e.g., <span
+                style="background: rgb(13, 43, 85); border-radius: 4px; color: white; font-family: monospace; padding: 1px 7px;">ZEMP_TABLE</span>.
+        </li>
+        <li>At the bottom of the screen, tap the <strong>Create</strong> button.</li>
+        <li>Click on the <strong>Create</strong> button. A new screen will appear.</li>
+        <li>Provide a <strong>Short Description</strong> for the table. E.g., <em>Employee Table</em>.</li>
+        <li>Select the <strong>Delivery Class</strong> <span
+                style="background: rgb(13, 43, 85); border-radius: 4px; color: white; font-family: monospace; padding: 1px 7px;">'A'</span>.
+        </li>
+        <li>Delivery Class determines how SAP manages table data during transport and upgrades.</li>
+        <li>Set <strong>Maintenance Option</strong> to <strong>Display/Maintenance Allowed</strong>.</li>
+        <li>Now create the required fields as shown in the table below.</li>
+    </ol>
+
+    <!--Fields Table-->
+    <div style="margin-bottom: 20px; overflow-x: auto;">
+        <table
+            style="border-collapse: collapse; font-family: &quot;Segoe UI&quot;, Arial, sans-serif; font-size: 0.95em; width: 100%;">
+            <thead>
+                <tr style="background: rgb(21, 101, 192); color: white;">
+                    <th style="border: 1px solid rgb(18, 85, 168); padding: 11px 16px; text-align: left;">Field Name
+                    </th>
+                    <th style="border: 1px solid rgb(18, 85, 168); padding: 11px 16px; text-align: left;">Data Element
+                    </th>
+                    <th style="border: 1px solid rgb(18, 85, 168); padding: 11px 16px; text-align: left;">Key</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="background: rgb(244, 248, 255);">
+                    <td style="border: 1px solid rgb(221, 230, 240); font-family: monospace; padding: 10px 16px;">EMP_ID
+                    </td>
+                    <td style="border: 1px solid rgb(221, 230, 240); font-family: monospace; padding: 10px 16px;">
+                        ZDE_EMP_ID</td>
+                    <td style="border: 1px solid rgb(221, 230, 240); padding: 10px 16px;"><span
+                            style="background: rgb(21, 101, 192); border-radius: 4px; color: white; font-size: 0.9em; padding: 2px 10px;">Yes</span>
+                    </td>
+                </tr>
+                <tr style="background: rgb(255, 255, 255);">
+                    <td style="border: 1px solid rgb(221, 230, 240); font-family: monospace; padding: 10px 16px;">
+                        EMP_NAME</td>
+                    <td style="border: 1px solid rgb(221, 230, 240); font-family: monospace; padding: 10px 16px;">
+                        ZDE_EMP_NAME</td>
+                    <td style="border: 1px solid rgb(221, 230, 240); padding: 10px 16px;">No</td>
+                </tr>
+                <tr style="background: rgb(244, 248, 255);">
+                    <td style="border: 1px solid rgb(221, 230, 240); font-family: monospace; padding: 10px 16px;">
+                        DEPARTMENT</td>
+                    <td style="border: 1px solid rgb(221, 230, 240); font-family: monospace; padding: 10px 16px;">
+                        ZDE_DEPARTMENT</td>
+                    <td style="border: 1px solid rgb(221, 230, 240); padding: 10px 16px;">No</td>
+                </tr>
+                <tr style="background: rgb(255, 255, 255);">
+                    <td style="border: 1px solid rgb(221, 230, 240); font-family: monospace; padding: 10px 16px;">
+                        DESIGNATION</td>
+                    <td style="border: 1px solid rgb(221, 230, 240); font-family: monospace; padding: 10px 16px;">
+                        ZDE_DESIGNATION</td>
+                    <td style="border: 1px solid rgb(221, 230, 240); padding: 10px 16px;">No</td>
+                </tr>
+                <tr style="background: rgb(244, 248, 255);">
+                    <td style="border: 1px solid rgb(221, 230, 240); font-family: monospace; padding: 10px 16px;">SALARY
+                    </td>
+                    <td style="border: 1px solid rgb(221, 230, 240); font-family: monospace; padding: 10px 16px;">
+                        ZDE_SALARY</td>
+                    <td style="border: 1px solid rgb(221, 230, 240); padding: 10px 16px;">No</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p
+        style="color: #333333; font-family: &quot;Segoe UI&quot;, Arial, sans-serif; font-size: 1em; line-height: 1.8; margin: 0px 0px 10px;">
+    </p>
+    <div class="separator" style="clear: both; text-align: center;"><a
+            href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEg4CffRux7I81HyEkRVL08CeqeXptGteNyuMUoATSj0GXYEEh4cips9d69ka1mHF7w4YmJmBRwTXX_gWnaNpgDBSWv3pZIg_G4zslAGlPgTbpoQ6B1dbgPnutdDCtLCAbPSCkc9oploISlIgLh-go2oFP9kQOgm2L7gUleGazzDlEL0qe6KCqMEanLd_DLP/s2940/Screenshot%202026-06-05%20at%208.33.11%E2%80%AFPM.png"
+            style="margin-left: 1em; margin-right: 1em;"><img border="0" data-original-height="1912"
+                data-original-width="2940" height="259"
+                src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEg4CffRux7I81HyEkRVL08CeqeXptGteNyuMUoATSj0GXYEEh4cips9d69ka1mHF7w4YmJmBRwTXX_gWnaNpgDBSWv3pZIg_G4zslAGlPgTbpoQ6B1dbgPnutdDCtLCAbPSCkc9oploISlIgLh-go2oFP9kQOgm2L7gUleGazzDlEL0qe6KCqMEanLd_DLP/w399-h259/Screenshot%202026-06-05%20at%208.33.11%E2%80%AFPM.png"
+                width="399" /></a></div><br /><strong><br /></strong>
+    <p></p>
+    <p
+        style="color: #333333; font-family: &quot;Segoe UI&quot;, Arial, sans-serif; font-size: 1em; line-height: 1.8; margin: 0px 0px 10px;">
+        <strong>Step 14:</strong> Now set the <strong>Technical Settings</strong>:</p>
+    <ul
+        style="color: #333333; font-family: &quot;Segoe UI&quot;, Arial, sans-serif; font-size: 1em; line-height: 2; margin: 0px 0px 16px; padding-left: 22px;">
+        <li>Set <strong>Data Class</strong> to <span
+                style="background: rgb(13, 43, 85); border-radius: 4px; color: white; font-family: monospace; padding: 1px 7px;">APPL0</span>
+        </li>
+        <li>Set <strong>Size Category</strong> to <span
+                style="background: rgb(13, 43, 85); border-radius: 4px; color: white; font-family: monospace; padding: 1px 7px;">0</span>
+        </li>
+        <li>Save the settings.</li>
+    </ul>
+    <div><span face="Segoe UI, Arial, sans-serif" style="color: #333333;"><br /></span></div>
+    <div>
+        <div class="separator" style="clear: both; text-align: center;"><a
+                href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEg6vWfnwMaG_UB_BN9pwqHhMblyb44wxP59DlbitgaoaiUBq28Fmhni_mPLeJIeyiDnnRvwq-my6vtRp9BMxNkqbEAIJ8PLikwfCWAgt-jY_sy2lz-SWjVX140Fttq8GsBEmfsy-OsGWKdheyHnrEu394LOVkoe_zhXImZfw68nLKUhImFDYwJkTRHjPcIJ/s2764/Screenshot%202026-06-05%20at%208.35.47%E2%80%AFPM.png"
+                style="margin-left: 1em; margin-right: 1em;"><img border="0" data-original-height="1540"
+                    data-original-width="2764" height="200"
+                    src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEg6vWfnwMaG_UB_BN9pwqHhMblyb44wxP59DlbitgaoaiUBq28Fmhni_mPLeJIeyiDnnRvwq-my6vtRp9BMxNkqbEAIJ8PLikwfCWAgt-jY_sy2lz-SWjVX140Fttq8GsBEmfsy-OsGWKdheyHnrEu394LOVkoe_zhXImZfw68nLKUhImFDYwJkTRHjPcIJ/w360-h200/Screenshot%202026-06-05%20at%208.35.47%E2%80%AFPM.png"
+                    width="360" /></a></div><br /><span face="Segoe UI, Arial, sans-serif"
+            style="color: #333333;"><br /></span>
+    </div>
+
+    <p
+        style="color: #333333; font-family: &quot;Segoe UI&quot;, Arial, sans-serif; font-size: 1em; line-height: 1.8; margin: 0px 0px 6px;">
+        <strong>Step 15:</strong> Save the table using <span
+            style="background: rgb(13, 43, 85); border-radius: 4px; color: white; font-family: monospace; padding: 1px 7px;">CTRL+S</span>.
+    </p>
+    <p
+        style="color: #333333; font-family: &quot;Segoe UI&quot;, Arial, sans-serif; font-size: 1em; line-height: 1.8; margin: 0px;">
+        <strong>Step 16:</strong> Activate the table by pressing <span
+            style="background: rgb(13, 43, 85); border-radius: 4px; color: white; font-family: monospace; padding: 1px 7px;">CTRL+F3</span>.
+    </p>
+    <p
+        style="color: #333333; font-family: &quot;Segoe UI&quot;, Arial, sans-serif; font-size: 1em; line-height: 1.8; margin: 0px;">
+        <br /></p>
+    <div class="separator" style="clear: both; text-align: center;"><iframe allowfullscreen="" class="BLOG_video_class"
+            height="288" src="https://www.youtube.com/embed/gRgMwWt1kuw" width="633"
+            youtube-src-id="gRgMwWt1kuw"></iframe></div><br />
+    <p
+        style="color: #333333; font-family: &quot;Segoe UI&quot;, Arial, sans-serif; font-size: 1em; line-height: 1.8; margin: 0px;">
+        <br /></p>
+</div>
+
+<!--Technical Settings-->
+<div
+    style="background: rgb(255, 255, 255); border-radius: 10px; border: 1px solid rgb(221, 230, 240); box-shadow: rgba(13, 43, 85, 0.06) 0px 2px 8px; margin-bottom: 28px; padding: 28px 30px;">
+    <h2
+        style="border-left: 5px solid rgb(21, 101, 192); color: #0d2b55; font-family: Georgia, serif; font-size: 1.5em; margin: 0px 0px 16px; padding-left: 14px;">
+        Understanding Technical Settings</h2>
+    <p
+        style="color: #555555; font-family: &quot;Segoe UI&quot;, Arial, sans-serif; font-size: 1em; line-height: 1.8; margin: 0px 0px 20px;">
+        Many beginners simply fill in values without understanding them. Here is a clear explanation of each technical
+        setting.</p>
+
+    <h3
+        style="color: #1565c0; font-family: &quot;Segoe UI&quot;, Arial, sans-serif; font-size: 1.1em; margin: 0px 0px 10px;">
+        Data Class</h3>
+    <p
+        style="color: #444444; font-family: &quot;Segoe UI&quot;, Arial, sans-serif; font-size: 0.97em; line-height: 1.8; margin: 0px 0px 12px;">
+        Determines the physical area where data will be stored.</p>
+    <div style="margin-bottom: 22px; overflow-x: auto;">
+        <table
+            style="border-collapse: collapse; font-family: &quot;Segoe UI&quot;, Arial, sans-serif; font-size: 0.95em; width: 100%;">
+            <thead>
+                <tr style="background: rgb(21, 101, 192); color: white;">
+                    <th style="border: 1px solid rgb(18, 85, 168); padding: 11px 16px; text-align: left;">Data Class
+                    </th>
+                    <th style="border: 1px solid rgb(18, 85, 168); padding: 11px 16px; text-align: left;">Purpose</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="background: rgb(244, 248, 255);">
+                    <td style="border: 1px solid rgb(221, 230, 240); font-family: monospace; padding: 10px 16px;">APPL0
+                    </td>
+                    <td style="border: 1px solid rgb(221, 230, 240); padding: 10px 16px;">Master Data</td>
+                </tr>
+                <tr style="background: rgb(255, 255, 255);">
+                    <td style="border: 1px solid rgb(221, 230, 240); font-family: monospace; padding: 10px 16px;">APPL1
+                    </td>
+                    <td style="border: 1px solid rgb(221, 230, 240); padding: 10px 16px;">Transaction Data</td>
+                </tr>
+                <tr style="background: rgb(244, 248, 255);">
+                    <td style="border: 1px solid rgb(221, 230, 240); font-family: monospace; padding: 10px 16px;">APPL2
+                    </td>
+                    <td style="border: 1px solid rgb(221, 230, 240); padding: 10px 16px;">Organizational Data</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h3
+        style="color: #1565c0; font-family: &quot;Segoe UI&quot;, Arial, sans-serif; font-size: 1.1em; margin: 0px 0px 8px;">
+        Size Category</h3>
+    <p
+        style="color: #444444; font-family: &quot;Segoe UI&quot;, Arial, sans-serif; font-size: 0.97em; line-height: 1.8; margin: 0px;">
+        Indicates the expected size of the table. For small tables, set this to <span
+            style="background: rgb(13, 43, 85); border-radius: 4px; color: white; font-family: monospace; padding: 1px 7px;">0</span>.
+    </p>
+    <p
+        style="color: #444444; font-family: &quot;Segoe UI&quot;, Arial, sans-serif; font-size: 0.97em; line-height: 1.8; margin: 0px;">
+        <br /></p>
+    <p
+        style="color: #444444; font-family: &quot;Segoe UI&quot;, Arial, sans-serif; font-size: 0.97em; line-height: 1.8; margin: 0px;">
+        <br /></p>
+</div>
+
+<!--Learn Domain and Data Element-->
+<div
+    style="background: rgb(232, 244, 253); border-radius: 10px; border: 1px solid rgb(179, 212, 240); margin-bottom: 28px; padding: 22px 26px;">
+    <p
+        style="color: #0d2b55; font-family: &quot;Segoe UI&quot;, Arial, sans-serif; font-size: 1em; line-height: 1.8; margin: 0px 0px 10px;">
+        <strong> Learn More:</strong> To learn how to create a Domain and Data Element, refer to these guides:</p>
+    <ul
+        style="font-family: &quot;Segoe UI&quot;, Arial, sans-serif; font-size: 0.97em; line-height: 2; margin: 0px; padding-left: 20px;">
+        <li><a href="https://learnsapwithdaksh.blogspot.com/2026/07/domain-in-sap-abapse11.html"
+                style="color: #1565c0; font-weight: 600; text-decoration: none;">▶ How to Create a Domain in SAP ABAP
+                (SE11)</a></li>
+        <li><a href="https://learnsapwithdaksh.blogspot.com/2026/06/blogpost.html"
+                style="color: #1565c0; font-weight: 600; text-decoration: none;">▶ How to Create a Data Element in SAP
+                ABAP</a></li>
+    </ul>
+</div>
+
+<!--SE16N Data Entry-->
+<div
+    style="background: rgb(255, 255, 255); border-radius: 10px; border: 1px solid rgb(221, 230, 240); box-shadow: rgba(13, 43, 85, 0.06) 0px 2px 8px; margin-bottom: 28px; padding: 28px 30px;">
+    <h2
+        style="border-left: 5px solid rgb(21, 101, 192); color: #0d2b55; font-family: Georgia, serif; font-size: 1.5em; margin: 0px 0px 20px; padding-left: 14px;">
+        How to Enter Data in a SAP ABAP Table Using SE16N</h2>
+
+    <h3
+        style="color: #1565c0; font-family: &quot;Segoe UI&quot;, Arial, sans-serif; font-size: 1.1em; margin: 0px 0px 10px;">
+        Step 1: Open Transaction SE16N</h3>
+    <ol
+        style="color: #333333; font-family: &quot;Segoe UI&quot;, Arial, sans-serif; font-size: 1em; line-height: 2; margin: 0px 0px 20px; padding-left: 22px;">
+        <li>Go to the SAP command field.</li>
+        <li>Enter the transaction code: <span
+                style="background: rgb(13, 43, 85); border-radius: 4px; color: white; font-family: monospace; padding: 1px 7px;">SE16N</span>
+            and press <strong>Enter</strong>.</li>
+    </ol>
+    <div><span face="Segoe UI, Arial, sans-serif" style="color: #333333;"><br /></span></div>
+    <div>
+        <div class="separator" style="clear: both; text-align: center;"><a
+                href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiymhJ31bcki_OiFuSPyRui9jOOc1z5DeOzztQt_Qo-pSjmIrytPdehEzqdRFreVJ7RwpxKwmJvAMXEUMhSnHYAilOQiTH90plUorQzjJ3fSnbjpqZsUxN7mfnk9W-8_t1zFeG7W3zKHHI0RrqLG5zXSl0UD2JfqpIfyZHL3Tdq3dXw1BUzobjj43w9dLKi/s2418/Screenshot%202026-06-05%20at%208.36.55%E2%80%AFPM.png"
+                style="margin-left: 1em; margin-right: 1em;"><img border="0" data-original-height="1490"
+                    data-original-width="2418" height="228"
+                    src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiymhJ31bcki_OiFuSPyRui9jOOc1z5DeOzztQt_Qo-pSjmIrytPdehEzqdRFreVJ7RwpxKwmJvAMXEUMhSnHYAilOQiTH90plUorQzjJ3fSnbjpqZsUxN7mfnk9W-8_t1zFeG7W3zKHHI0RrqLG5zXSl0UD2JfqpIfyZHL3Tdq3dXw1BUzobjj43w9dLKi/w371-h228/Screenshot%202026-06-05%20at%208.36.55%E2%80%AFPM.png"
+                    width="371" /></a></div><br /><span face="Segoe UI, Arial, sans-serif"
+            style="color: #333333;"><br /></span>
+    </div>
+
+    <h3
+        style="color: #1565c0; font-family: &quot;Segoe UI&quot;, Arial, sans-serif; font-size: 1.1em; margin: 0px 0px 10px;">
+        Step 2: Enter the Table Name</h3>
+    <p
+        style="color: #444444; font-family: &quot;Segoe UI&quot;, Arial, sans-serif; font-size: 1em; line-height: 1.8; margin: 0px 0px 6px;">
+        In the <strong>Table</strong> field, enter your custom table name.</p>
+    <p
+        style="color: #444444; font-family: &quot;Segoe UI&quot;, Arial, sans-serif; font-size: 1em; margin: 0px 0px 20px;">
+        Example: <span
+            style="background: rgb(13, 43, 85); border-radius: 4px; color: white; font-family: monospace; padding: 2px 8px;">ZEMPLOYEE_TABLE</span>
+    </p>
+
+    <h3
+        style="color: #1565c0; font-family: &quot;Segoe UI&quot;, Arial, sans-serif; font-size: 1.1em; margin: 0px 0px 10px;">
+        Step 3: Access Table Data</h3>
+    <p
+        style="color: #444444; font-family: &quot;Segoe UI&quot;, Arial, sans-serif; font-size: 1em; line-height: 1.8; margin: 0px 0px 6px;">
+        The system will display the selection screen for the table.</p>
+    <p
+        style="color: #444444; font-family: &quot;Segoe UI&quot;, Arial, sans-serif; font-size: 1em; margin: 0px 0px 20px;">
+        To view existing records, press <span
+            style="background: rgb(13, 43, 85); border-radius: 4px; color: white; font-family: monospace; padding: 1px 7px;">F8</span>.
+    </p>
+
+    <h3
+        style="color: #1565c0; font-family: &quot;Segoe UI&quot;, Arial, sans-serif; font-size: 1.1em; margin: 0px 0px 10px;">
+        Step 4: Create a New Entry</h3>
+    <ol
+        style="color: #333333; font-family: &quot;Segoe UI&quot;, Arial, sans-serif; font-size: 1em; line-height: 2; margin: 0px 0px 20px; padding-left: 22px;">
+        <li>Click the <strong>Create Entry</strong> button.</li>
+        <li>A new screen will appear showing all table fields.</li>
+        <li>Enter values for each field.</li>
+        <li>Fill in all required entries.</li>
+    </ol>
+
+    <h3
+        style="color: #1565c0; font-family: &quot;Segoe UI&quot;, Arial, sans-serif; font-size: 1.1em; margin: 0px 0px 10px;">
+        Step 5: Save the Record</h3>
+    <ol
+        style="color: #333333; font-family: &quot;Segoe UI&quot;, Arial, sans-serif; font-size: 1em; line-height: 2; margin: 0px 0px 10px; padding-left: 22px;">
+        <li>Click the <strong>Save</strong> button.</li>
+        <li>SAP will validate the data.</li>
+        <li>If no errors are found, the record will be stored in the table.</li>
+    </ol>
+    <div
+        style="background: rgb(227, 240, 255); border-left: 5px solid rgb(21, 101, 192); border-radius: 6px; color: #0d2b55; font-family: &quot;Segoe UI&quot;, Arial, sans-serif; font-size: 0.97em; margin-bottom: 20px; padding: 12px 18px;">
+        ✅ A success message will appear confirming that the data has been saved.
+    </div>
+
+    <h3
+        style="color: #1565c0; font-family: &quot;Segoe UI&quot;, Arial, sans-serif; font-size: 1.1em; margin: 0px 0px 10px;">
+        Step 6: Verify the Data</h3>
+    <p
+        style="color: #444444; font-family: &quot;Segoe UI&quot;, Arial, sans-serif; font-size: 1em; line-height: 1.8; margin: 0px 0px 10px;">
+        To confirm the record has been inserted successfully:</p>
+    <ol
+        style="color: #333333; font-family: &quot;Segoe UI&quot;, Arial, sans-serif; font-size: 1em; line-height: 2; margin: 0px; padding-left: 22px;">
+        <li>Return to the SE16N selection screen.</li>
+        <li>Enter the table name.</li>
+        <li>Click <strong>Execute (F8)</strong>.</li>
+    </ol>
+</div>
+
+<!--Conclusion-->
+<div
+    style="background: linear-gradient(135deg, rgb(13, 43, 85) 0%, rgb(21, 101, 192) 100%); border-radius: 12px; color: white; margin-bottom: 20px; padding: 30px 32px;">
+    <h2
+        style="border-left: 5px solid rgb(100, 181, 246); color: white; font-family: Georgia, serif; font-size: 1.5em; margin: 0px 0px 14px; padding-left: 14px;">
+        Conclusion</h2>
+    <p
+        style="color: #dceeff; font-family: &quot;Segoe UI&quot;, Arial, sans-serif; font-size: 1.02em; line-height: 1.85; margin: 0px;">
+        Creating a table in SAP ABAP is one of the basic but most important skills for any beginner. By learning how to
+        create a custom table, define fields, set technical settings, and view or maintain data, you build a strong
+        foundation for working with SAP applications. As you continue learning ABAP, tables will be used in almost every
+        project you work on. With regular practice, the process becomes much easier and helps you understand how data is
+        stored and managed within the SAP system.</p>
+</div>

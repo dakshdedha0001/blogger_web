@@ -1,0 +1,29 @@
+# Block indexation of Cloudflare Pages preview domain only
+https://learnsapfree.pages.dev/*
+  X-Robots-Tag: noindex
+
+# Production domain: SEO-friendly headers
+https://learnsapfree.com/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: SAMEORIGIN
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+
+# Cache static assets aggressively for Core Web Vitals performance
+https://learnsapfree.com/*.jpg
+  Cache-Control: public, max-age=31536000, immutable
+
+https://learnsapfree.com/*.png
+  Cache-Control: public, max-age=31536000, immutable
+
+https://learnsapfree.com/*.webp
+  Cache-Control: public, max-age=31536000, immutable
+
+https://learnsapfree.com/*.css
+  Cache-Control: public, max-age=31536000, immutable
+
+https://learnsapfree.com/*.js
+  Cache-Control: public, max-age=31536000, immutable
+
+https://learnsapfree.com/*.ico
+  Cache-Control: public, max-age=31536000, immutable

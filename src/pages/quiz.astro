@@ -1,0 +1,37 @@
+---
+// src/pages/quiz.astro
+import Layout from '../layouts/Layout.astro';
+import Quiz from '../components/Quiz.astro';
+---
+
+<Layout 
+  title="SAP Quiz Challenge - Learn SAP Free" 
+  description="Test your knowledge of ABAP coding, SAP HANA databases, OData interfaces, and security roles in our interactive developer micro-quiz."
+>
+  <section class="bg-surface-tile-1 text-body-on-dark py-[80px] min-h-[70vh] flex flex-col justify-center ">
+    <div class="max-w-[640px] mx-auto w-full px-4">
+      
+      <!-- Back Link -->
+      <a href="/" class="text-link-on-dark font-caption-strong text-[14px] inline-flex items-center gap-1 mb-8 hover:opacity-80 transition-opacity">
+        <svg class="w-4 h-4 stroke-current fill-none stroke-[2]" viewBox="0 0 24 24">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Back to Dashboard
+      </a>
+
+      <!-- Headline Header -->
+      <div class="text-center mb-[32px]">
+        <span class="text-primary-on-dark font-caption-strong text-[13px] uppercase tracking-wider mb-2 block">Developer Academy</span>
+        <h1 class="font-display-lg text-[32px] md:text-[40px] tracking-tight leading-none mb-3">SAP Micro Challenge</h1>
+        <p class="font-body-apple text-[15px] text-body-muted leading-relaxed">
+          Answer multiple choice questions on core ABAP OO syntax, database tables, authorizations, and Basis server queues.
+        </p>
+      </div>
+
+      <!-- Quiz Widget -->
+      <Quiz />
+
+    </div>
+  </section>
+</Layout>

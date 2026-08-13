@@ -1,0 +1,177 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+// JSON-LD: AboutPage schema
+const aboutPageSchema = {
+  "@context": "https://schema.org",
+  "@type": "AboutPage",
+  "name": "About Learn SAP Free",
+  "description": "Discover the mission of Learn SAP Free, a community platform dedicated to guiding SAP students and developers from basic to advanced knowledge.",
+  "url": "https://learnsapfree.com/about",
+  "mainEntity": {
+    "@type": "Organization",
+    "name": "Learn SAP Free",
+    "url": "https://learnsapfree.com",
+    "founder": {
+      "@type": "Person",
+      "name": "Daksh Dedha",
+      "jobTitle": "SAP Technical Consultant & Developer",
+      "image": "https://learnsapfree.com/daksh-avatar-v2.png",
+      "sameAs": [
+        "https://www.youtube.com/channel/UCTivqSC8zUouAkk-YZEqnKg",
+        "https://github.com/dakshdedha0001"
+      ]
+    },
+    "foundingDate": "2024",
+    "description": "An independent community learning resource for SAP ABAP, Fiori, HANA, BTP, and Basis training."
+  }
+};
+
+// JSON-LD: BreadcrumbList
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://learnsapfree.com"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "About Us",
+      "item": "https://learnsapfree.com/about"
+    }
+  ]
+};
+---
+
+<Layout 
+  title="About Us - Learn SAP Free | SAP Training Community"
+  description="Discover the mission of Learn SAP Free — a free community platform dedicated to guiding SAP learners and developers from basic to advanced practical knowledge in ABAP, Fiori, HANA, and BTP."
+  keywords={[
+    "about learn sap free", "sap learning community", "sap training mission",
+    "free sap education", "sap abap learning platform", "sap developer community"
+  ]}
+>
+  <script type="application/ld+json" set:html={JSON.stringify(aboutPageSchema)} slot="head" />
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} slot="head" />
+
+  <section class="bg-canvas py-[80px] min-h-[60vh] ">
+    <div class="max-w-[720px] mx-auto px-4">
+
+      <!-- Breadcrumb Navigation -->
+      <nav aria-label="Breadcrumb" class="mb-6">
+        <ol class="flex items-center gap-1.5 font-caption text-[13px] text-ink-muted-48">
+          <li><a href="/" class="hover:text-primary transition-colors">Home</a></li>
+          <li><span class="mx-1">›</span></li>
+          <li class="text-ink font-semibold">About Us</li>
+        </ol>
+      </nav>
+      
+      <!-- Back Link -->
+      <a href="/" class="text-link font-caption-strong text-[14px] inline-flex items-center gap-1 mb-8 hover:text-primary-focus transition-colors">
+        <svg class="w-4 h-4 stroke-current fill-none stroke-[2]" viewBox="0 0 24 24">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Back to Dashboard
+      </a>
+
+      <!-- Page Header -->
+      <header class="border-b border-hairline pb-6 mb-8">
+        <span class="text-primary font-caption-strong text-[13px] uppercase tracking-wider block mb-2">Our Mission</span>
+        <h1 class="font-display-lg text-[32px] md:text-[40px] text-ink leading-tight tracking-tight">About Us</h1>
+      </header>
+
+      <!-- Content -->
+      <div class="rich-text">
+        <h2>Our Mission</h2>
+        <p>
+          Learn SAP Free is built on one simple belief: <strong>quality SAP education should be accessible to everyone, regardless of their financial situation</strong>. We provide free, practical, and structured tutorials that guide learners from their very first ABAP program to advanced enterprise development with Fiori, HANA, BTP, and beyond.
+        </p>
+        <p>
+          Whether you are a student exploring SAP for the first time, a fresher preparing for your first SAP job, or a working professional looking to upskill — this platform is designed to help you succeed without paying thousands for certifications or training.
+        </p>
+
+        <h2>Meet the Author</h2>
+        <div class="flex flex-col sm:flex-row gap-6 items-start my-6 p-6 bg-canvas-parchment rounded-lg border border-hairline">
+          <img 
+            src="/daksh-avatar-v2.png" 
+            alt="Daksh Dedha - SAP ABAP Developer" 
+            class="w-[80px] h-[80px] rounded-full object-cover shrink-0 border-2 border-primary/20 shadow-sm"
+          />
+          <div>
+            <h3 class="!mt-0 !mb-1">Daksh Dedha</h3>
+            <p class="font-caption text-[14px] text-ink-muted-48 !mb-3">SAP Technical Consultant &amp; Content Creator</p>
+            <p class="!mb-3">
+              Hi, I'm <strong>Daksh</strong> — an SAP ABAP developer with hands-on experience in SAP ECC, S/4HANA, Fiori, and BTP environments. I started this blog because when I was learning SAP myself, I struggled to find free, comprehensive, and beginner-friendly resources online.
+            </p>
+            <p class="!mb-3">
+              Most SAP content was either locked behind expensive courses, scattered across forums without structure, or written in technical jargon that made beginners feel lost. I decided to change that by building a platform that explains SAP concepts the way I wish they had been explained to me — clearly, practically, and with real code examples.
+            </p>
+            <div class="flex items-center gap-4 mt-4 flex-wrap">
+              <a href="https://github.com/dakshdedha0001" target="_blank" rel="noopener noreferrer" class="text-link font-caption-strong text-[13px] inline-flex items-center gap-1.5 hover:opacity-85 transition-opacity" aria-label="Visit Daksh's GitHub profile">
+                <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                GitHub
+              </a>
+              <a href="https://www.youtube.com/channel/UCTivqSC8zUouAkk-YZEqnKg" target="_blank" rel="noopener noreferrer" class="text-link font-caption-strong text-[13px] inline-flex items-center gap-1.5 hover:opacity-85 transition-opacity" aria-label="Visit our YouTube channel">
+                <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814z"/><polygon fill="var(--canvas)" points="9.545 15.568 15.818 12 9.545 8.432"/></svg>
+                YouTube
+              </a>
+              <a href="/contact" class="text-link font-caption-strong text-[13px] inline-flex items-center gap-1.5 hover:opacity-85 transition-opacity">
+                <svg class="w-4 h-4 fill-none stroke-current stroke-[2]" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                Contact
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <h2>What You'll Find Here</h2>
+        <p>Learn SAP Free currently offers <strong>65+ in-depth tutorials</strong> covering:</p>
+        <ul>
+          <li><strong>SAP ABAP Programming</strong> — From the DATA statement to internal tables, loops, modularization, and real-world coding patterns</li>
+          <li><strong>Data Dictionary (DDIC)</strong> — Domains, data elements, structures, tables, and SE11 transactions explained step-by-step</li>
+          <li><strong>SAP Fiori &amp; SAPUI5</strong> — Building modern UIs, Fiori Elements, RAP-based development, and interview preparation</li>
+          <li><strong>SAP BTP &amp; Integration Suite</strong> — Cloud platform architecture, Integration Suite capabilities, and career opportunities</li>
+          <li><strong>Career Guides</strong> — SAP job market insights, interview question banks, career roadmaps, and salary guidance</li>
+          <li><strong>Interactive Tools</strong> — T-Code Lookup, daily SAP tips, and practice quizzes to reinforce learning</li>
+        </ul>
+
+        <h2>Our Approach</h2>
+        <p>
+          Every tutorial on this platform follows a consistent structure: <strong>explain the concept → show the syntax → demonstrate with a real example → provide practice exercises</strong>. We believe in learning by doing, not just reading theory.
+        </p>
+        <p>
+          All code examples are written and tested in actual SAP systems. Screenshots are taken from real SAP GUI and BAS (Business Application Studio) environments so you can follow along exactly as shown.
+        </p>
+
+        <h2>Why "Learn SAP Free"?</h2>
+        <p>
+          SAP is one of the most in-demand enterprise technologies in the world, powering 77% of the world's transaction revenue. Yet, quality SAP training has traditionally been expensive and inaccessible. We believe that shouldn't be a barrier to building a career in SAP.
+        </p>
+        <p>
+          This platform will always remain <strong>100% free</strong>. No paywalls, no premium tiers, no locked content. Every tutorial, every quiz, every tool — completely free and open to everyone.
+        </p>
+
+        <h2>Stay Connected</h2>
+        <p>
+          Have questions, feedback, or tutorial suggestions? We'd love to hear from you:
+        </p>
+        <ul>
+          <li><strong>Email:</strong> <a href="mailto:support@learnsapfree.com" class="text-link">support@learnsapfree.com</a></li>
+          <li><strong>YouTube:</strong> <a href="https://www.youtube.com/channel/UCTivqSC8zUouAkk-YZEqnKg" target="_blank" rel="noopener noreferrer" class="text-link">Subscribe to our channel</a> for video tutorials</li>
+          <li><strong>Contact:</strong> <a href="/contact" class="text-link">Send us a message</a> through our contact form</li>
+        </ul>
+
+        <br />
+        <p>Thank you for being part of this learning journey. Together, we're making SAP accessible to everyone.</p>
+        <p><strong>— Daksh Dedha</strong><br /><span class="font-caption text-[14px] text-ink-muted-48">Founder, Learn SAP Free</span></p>
+      </div>
+
+    </div>
+  </section>
+</Layout>
+

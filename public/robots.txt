@@ -1,0 +1,58 @@
+# Explicitly allow ALL Google AdSense & Google Ads crawlers
+User-agent: Mediapartners-Google
+Allow: /
+
+User-agent: Mediapartners (Googlebot)
+Allow: /
+
+User-agent: AdsBot-Google
+Allow: /
+
+User-agent: AdsBot-Google-Mobile
+Allow: /
+
+User-agent: AdsBot-Google-Mobile-Apps
+Allow: /
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Googlebot-Image
+Allow: /
+
+User-agent: Googlebot-Mobile
+Allow: /
+
+# Global rules for all search engines (Googlebot, Bingbot, Yahoo, DuckDuckGo)
+User-agent: *
+Allow: /
+
+# Block unwanted AI scrapers (does not affect Search or AdSense)
+User-agent: GPTBot
+Disallow: /
+
+User-agent: ChatGPT-User
+Disallow: /
+
+User-agent: anthropic-ai
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: Bytespider
+Disallow: /
+
+# Crawl Budget Optimization: Prevent crawling of non-value/duplicate paths
+Disallow: /scratch/
+Disallow: /.astro/
+Disallow: /404
+Disallow: /500
+
+# Prevent crawling of URLs with query parameters (filters, sorting, tracking)
+Disallow: /*?*
+Disallow: /*?category=
+Disallow: /*?search=
+
+# Sitemaps
+Sitemap: https://learnsapfree.com/sitemap.xml

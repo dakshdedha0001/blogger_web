@@ -1,0 +1,1093 @@
+---
+// src/pages/blog/[slug].astro
+import { getCollection, render } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import Quiz from '../../components/Quiz.astro';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  return posts.map(post => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content, headings = [] } = await render(post);
+const toc = headings.filter(h => h.depth === 2 || h.depth === 3);
+
+// Fetch other posts for the sidebar/recent list (exclude current, sorted by learning order)
+const allPosts = await getCollection('blog');
+const recentPosts = allPosts
+  .filter(p => p.id !== post.id)
+  .sort((a, b) => {
+    const orderA = a.data.order ?? 999;
+    const orderB = b.data.order ?? 999;
+    if (orderA !== orderB) {
+      return orderA - orderB;
+    }
+    return b.data.pubDate.valueOf() - a.data.pubDate.valueOf();
+  })
+  .slice(0, 3);
+
+// Find the next post in the learning sequence
+const sortedAllPosts = allPosts.sort((a, b) => {
+  const orderA = a.data.order ?? 999;
+  const orderB = b.data.order ?? 999;
+  if (orderA !== orderB) {
+    return orderA - orderB;
+  }
+  return b.data.pubDate.valueOf() - a.data.pubDate.valueOf();
+});
+const currentPostIndex = sortedAllPosts.findIndex(p => p.id === post.id);
+const nextPost = currentPostIndex !== -1 && currentPostIndex < sortedAllPosts.length - 1 
+  ? sortedAllPosts[currentPostIndex + 1] 
+  : null;
+
+// Find related posts (same category first, fallback to other categories to ensure always 3 internal links)
+const sameCategoryPosts = allPosts
+  .filter(p => p.id !== post.id && p.data.category === post.data.category)
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+const otherCategoryPosts = allPosts
+  .filter(p => p.id !== post.id && p.data.category !== post.data.category)
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+const relatedPosts = [...sameCategoryPosts, ...otherCategoryPosts].slice(0, 3);
+
+const getCategoryColorClass = (category: string) => {
+  switch (category.toUpperCase()) {
+    case 'ABAP PROGRAMMING': return 'text-primary';
+    case 'DATA DICTIONARY': return 'text-indigo-600';
+    case 'SAP BTP': return 'text-amber-600';
+    default: return 'text-purple-600';
+  }
+};
+
+// SEO: Date strings for meta tags
+const publishedDate = post.data.pubDate.toISOString();
+const modifiedDate = (post.data.lastModified || post.data.pubDate).toISOString();
+const isUpdated = !!post.data.lastModified;
+
+// SEO: Absolute image URL
+const absoluteImageUrl = post.data.image 
+  ? `https://learnsapfree.com${post.data.image}` 
+  : 'https://learnsapfree.com/logo.png';
+
+// JSON-LD: Article schema
+const articleSchema = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": post.data.title,
+  "description": post.data.description,
+  "image": absoluteImageUrl,
+  "author": {
+    "@type": "Person",
+    "name": post.data.author,
+    "url": "https://learnsapfree.com/about"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Learn SAP Free",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://learnsapfree.com/logo.png"
+    }
+  },
+  "datePublished": publishedDate,
+  "dateModified": modifiedDate,
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": `https://learnsapfree.com/blog/${post.id}`
+  },
+  "keywords": post.data.keywords ? post.data.keywords.join(', ') : post.data.category,
+  "articleSection": post.data.category,
+  "wordCount": Math.round(post.data.readingTime ? parseInt(post.data.readingTime) * 200 : 1000),
+  "inLanguage": "en-US"
+};
+
+// JSON-LD: BreadcrumbList schema
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://learnsapfree.com"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Blog",
+      "item": "https://learnsapfree.com/blog"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": post.data.title,
+      "item": `https://learnsapfree.com/blog/${post.id}`
+    }
+  ]
+};
+
+// JSON-LD: VideoObject schema (if embedded video is present)
+const videoSchema = post.data.video ? {
+  "@context": "https://schema.org",
+  "@type": "VideoObject",
+  "name": post.data.video.title,
+  "description": post.data.video.description,
+  "thumbnailUrl": [
+    `https://img.youtube.com/vi/${post.data.video.id}/maxresdefault.jpg`,
+    `https://img.youtube.com/vi/${post.data.video.id}/sddefault.jpg`,
+    `https://img.youtube.com/vi/${post.data.video.id}/hqdefault.jpg`
+  ],
+  "uploadDate": new Date(post.data.video.uploadDate).toISOString(),
+  "embedUrl": `https://www.youtube.com/embed/${post.data.video.id}`
+} : null;
+---
+
+<Layout 
+  title={`${post.data.title} - Learn SAP Free`} 
+  description={post.data.description}
+  image={post.data.image}
+  ogType="article"
+  keywords={post.data.keywords}
+  publishedTime={publishedDate}
+  modifiedTime={modifiedDate}
+  articleAuthor={post.data.author}
+>
+  <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} slot="head" />
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} slot="head" />
+  {videoSchema ? (
+    <script type="application/ld+json" set:html={JSON.stringify(videoSchema)} slot="head" />
+  ) : null}
+
+
+  <div class="bg-canvas py-[48px] ">
+    <div class="max-w-[1024px] mx-auto px-4 md:px-[24px]">
+      
+      <!-- Breadcrumb Navigation (Visible) -->
+      <nav aria-label="Breadcrumb" class="mb-6">
+        <ol class="flex items-center gap-1.5 font-caption text-[13px] text-ink-muted-48 flex-wrap">
+          <li><a href="/" class="hover:text-primary transition-colors">Home</a></li>
+          <li><span class="mx-1">›</span></li>
+          <li><a href="/blog" class="hover:text-primary transition-colors">Blog</a></li>
+          <li><span class="mx-1">›</span></li>
+          <li class="text-ink font-semibold line-clamp-1">{post.data.title}</li>
+        </ol>
+      </nav>
+
+      <!-- Back Navigation Link -->
+      <a href="/" class="text-link font-caption-strong text-[14px] inline-flex items-center gap-1 mb-8 hover:text-primary-focus transition-colors">
+        <svg class="w-4 h-4 stroke-current fill-none stroke-[2]" viewBox="0 0 24 24">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Back to Dashboard
+      </a>
+
+      <!-- Article Shell Grid (Main Content + Sidebar) -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-[48px]">
+        
+        <!-- Main Column: Article Content -->
+        <article class="lg:col-span-2">
+          <!-- Header -->
+          <header class="border-b border-hairline pb-[24px] mb-[32px]">
+            <span class={`font-caption-strong text-[13px] uppercase tracking-wider block mb-3 ${getCategoryColorClass(post.data.category)}`}>
+              {post.data.category}
+            </span>
+            <h1 class="font-display-lg text-[32px] md:text-[40px] text-ink leading-tight tracking-tight mb-4">
+              {post.data.title}
+            </h1>
+            
+            <div class="flex items-center justify-between flex-wrap gap-4 text-ink-muted-80 font-caption text-[14px]">
+              <div class="flex items-center gap-4 flex-wrap">
+                <span class="flex items-center gap-1.5">
+                  <svg class="w-4 h-4 text-ink-muted-48 fill-none stroke-current stroke-[2]" viewBox="0 0 24 24">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                  </svg>
+                  {post.data.author}
+                </span>
+                <span class="text-hairline">|</span>
+                <span>
+                  {isUpdated 
+                    ? `Last Updated: ${post.data.lastModified!.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}` 
+                    : post.data.pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                </span>
+                <span class="text-hairline">|</span>
+                <span class="flex items-center gap-1">
+                  <svg class="w-4 h-4 text-ink-muted-48 fill-none stroke-current stroke-[2]" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                  {post.data.readingTime || '5 min read'}
+                </span>
+              </div>
+
+              <!-- Action Buttons Wrapper -->
+              <div class="flex items-center gap-4 flex-wrap header-actions">
+                <!-- Bookmark Toggle button -->
+                <button 
+                  id="bookmark-toggle-btn"
+                  data-slug={post.id}
+                  data-title={post.data.title}
+                  data-category={post.data.category}
+                  class="inline-flex items-center gap-1.5 text-link hover:text-primary-focus font-caption-strong text-[14px] bg-transparent border-none cursor-pointer focus:outline-none"
+                  aria-label="Bookmark this guide"
+                >
+                  <!-- Bookmark Icon (Outline) -->
+                  <svg id="bookmark-icon-outline" class="w-4 h-4 stroke-current fill-none stroke-[2] block" viewBox="0 0 24 24">
+                    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                  </svg>
+                  <!-- Bookmark Icon (Filled) -->
+                  <svg id="bookmark-icon-filled" class="w-4 h-4 stroke-current fill-current stroke-[2] hidden text-primary" viewBox="0 0 24 24">
+                    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                  </svg>
+                  <span id="bookmark-status-text">Bookmark</span>
+                </button>
+              </div>
+            </div>
+          </header>
+
+          <!-- Table of Contents (Inline Card) -->
+          {toc.length > 1 && (
+            <div class="mb-[32px] p-[24px] bg-canvas-parchment rounded-xl border border-hairline relative overflow-hidden transition-all duration-300 hover:shadow-product">
+              <!-- Visual Accent line -->
+              <div class="absolute left-0 top-0 bottom-0 w-[4px] bg-primary rounded-r"></div>
+              
+              <h2 class="font-caption-strong text-ink text-[16px] font-semibold mb-4 tracking-tight flex items-center gap-2">
+                <svg class="w-4 h-4 text-primary fill-none stroke-current stroke-[2]" viewBox="0 0 24 24">
+                  <line x1="4" y1="9" x2="20" y2="9"></line>
+                  <line x1="4" y1="15" x2="20" y2="15"></line>
+                  <line x1="10" y1="3" x2="8" y2="21"></line>
+                  <line x1="16" y1="3" x2="14" y2="21"></line>
+                </svg>
+                Table of Contents
+              </h2>
+              <ul class="flex flex-col gap-2 font-caption text-[14px]">
+                {toc.map(heading => (
+                  <li class={`${heading.depth === 3 ? 'pl-6 list-none text-ink-muted-80' : 'list-none font-medium text-ink'}`}>
+                    <a 
+                      href={`#${heading.slug}`} 
+                      class="hover:text-primary transition-colors flex items-start gap-1.5 py-0.5"
+                    >
+                      {heading.depth === 2 ? (
+                        <span class="text-primary-focus/40 font-bold select-none mt-0.5">•</span>
+                      ) : (
+                        <span class="text-ink-muted-48 select-none mt-0.5">↳</span>
+                      )}
+                      <span>{heading.text}</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          <!-- Rendered Content Wrapper -->
+          <div class="rich-text">
+            <Content />
+          </div>
+
+          <!-- Author Bio Card (E-E-A-T Signal) -->
+          <div class="border-t border-hairline mt-[48px] pt-[32px]">
+            <div class="bg-canvas-parchment rounded-xl border border-hairline p-6 flex flex-col sm:flex-row gap-5 items-start">
+              <img 
+                src="/daksh-avatar-v2.png" 
+                alt="Daksh Dedha - SAP Technical Consultant" 
+                class="w-[64px] h-[64px] rounded-full object-cover shrink-0 border-2 border-primary/20 shadow-sm"
+              />
+              <div class="flex-grow">
+                <div class="flex items-center justify-between flex-wrap gap-2 mb-1">
+                  <h3 class="font-body-strong text-[17px] text-ink font-semibold">Written by Daksh Dedha</h3>
+                  <span class="text-[12px] font-caption text-primary font-medium bg-primary/5 px-2.5 py-0.5 rounded-full border border-primary/20">
+                    SAP Technical Consultant
+                  </span>
+                </div>
+                <p class="font-caption text-[14px] text-ink-muted-80 leading-relaxed mb-3">
+                  Daksh is an SAP Technical Consultant specializing in ABAP programming, SAP S/4HANA migrations, Fiori development, and BTP cloud architecture. He authors free, hands-on tutorials to make enterprise SAP education accessible to all developers.
+                </p>
+                <div class="flex items-center gap-4 text-[13px] font-caption-strong flex-wrap">
+                  <a href="/about" class="text-link hover:text-primary-focus inline-flex items-center gap-1">
+                    About Author &rarr;
+                  </a>
+                  <a href="https://github.com/dakshdedha0001" target="_blank" rel="noopener noreferrer" class="text-link hover:text-primary-focus inline-flex items-center gap-1">
+                    GitHub Profile
+                  </a>
+                  <a href="https://www.youtube.com/channel/UCTivqSC8zUouAkk-YZEqnKg" target="_blank" rel="noopener noreferrer" class="text-link hover:text-primary-focus inline-flex items-center gap-1">
+                    YouTube Channel
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Interactive Quiz Section -->
+          <div class="border-t border-hairline mt-[32px] pt-[32px]">
+            <h3 class="font-display-lg text-[22px] text-ink tracking-tight mb-6">Test Your Knowledge</h3>
+            <Quiz slug={post.id} />
+          </div>
+
+          <!-- Next Lesson Card -->
+          {nextPost && (
+            <div class="border-t border-hairline mt-[48px] pt-[32px] reveal">
+              <span class="text-primary font-caption-strong text-[13px] uppercase tracking-wider block mb-3">Up Next</span>
+              <a 
+                href={`/blog/${nextPost.id}`} 
+                class="group block bg-canvas-parchment rounded-xl border border-hairline p-6 hover:border-primary hover:shadow-product transition-all duration-300 relative overflow-hidden"
+              >
+                <!-- Arrow Icon -->
+                <div class="absolute right-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-canvas border border-hairline flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all shadow-sm">
+                  <svg class="w-5 h-5 fill-none stroke-current stroke-[2.5]" viewBox="0 0 24 24">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                  </svg>
+                </div>
+                <!-- Content -->
+                <div class="max-w-[85%]">
+                  <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-sm border bg-primary/5 text-primary border-primary/20 mb-2.5 inline-block">
+                    {nextPost.data.category}
+                  </span>
+                  <h4 class="font-display-lg text-[18px] md:text-[21px] text-ink group-hover:text-primary transition-colors leading-tight mb-1">
+                    {nextPost.data.title}
+                  </h4>
+                  <p class="font-caption text-[14px] text-ink-muted-80 line-clamp-2 leading-relaxed">
+                    {nextPost.data.description}
+                  </p>
+                </div>
+              </a>
+            </div>
+          )}
+
+          <!-- Related Posts Cluster -->
+          {relatedPosts.length > 0 && (
+            <div class="border-t border-hairline mt-[48px] pt-[32px] reveal">
+              <h3 class="font-display-lg text-[22px] text-ink tracking-tight mb-6">Related Tutorials</h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {relatedPosts.map(p => (
+                  <a href={`/blog/${p.id}`} class="block bg-canvas rounded-lg border border-hairline p-5 hover:border-primary hover:shadow-product transition-all group">
+                    <span class={`text-[10px] font-bold tracking-wider px-2 py-0.5 rounded-sm border mb-2.5 inline-block ${getCategoryColorClass(p.data.category).replace('text-', 'bg-').replace('600', '500/10 text-') + ' border-' + getCategoryColorClass(p.data.category).replace('text-', '') + '/20'}`}>
+                      {p.data.category}
+                    </span>
+                    <h4 class="font-body-strong text-[15px] text-ink group-hover:text-primary transition-colors leading-tight mb-2 line-clamp-2">
+                      {p.data.title}
+                    </h4>
+                    <p class="font-caption text-[13px] text-ink-muted-80 line-clamp-2">
+                      {p.data.description}
+                    </p>
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
+          
+          <!-- Bottom share CTA -->
+          <div class="border-t border-hairline mt-[48px] pt-[32px] flex items-center justify-between flex-wrap gap-4">
+            <p class="font-caption text-[14px] text-ink-muted-80">
+              Found this tutorial useful? Share it with your SAP development team.
+            </p>
+            <button 
+              id="copy-link-btn"
+              class="button-pearl-capsule text-[13px] font-semibold"
+            >
+              Copy Link
+            </button>
+          </div>
+        </article>
+
+        <!-- Sidebar Column: Other Training Guides -->
+        <aside class="lg:col-span-1 flex flex-col gap-8">
+          <!-- Sticky Table of Contents (Desktop Sidebar only) -->
+          {toc.length > 1 && (
+            <div class="hidden lg:block bg-canvas rounded-lg p-[16px] sticky top-[96px] border-l border-hairline/60">
+              <h4 class="font-caption-strong text-ink text-[12px] uppercase tracking-wider mb-4 font-semibold">
+                On This Page
+              </h4>
+              <nav class="toc-sidebar">
+                <ul class="flex flex-col gap-2.5 text-[13px] font-caption">
+                  {toc.map(heading => (
+                    <li class={`${heading.depth === 3 ? 'pl-4 text-ink-muted-80' : 'font-medium text-ink'}`}>
+                      <a 
+                        href={`#${heading.slug}`} 
+                        data-toc-slug={heading.slug}
+                        class="toc-sidebar-link hover:text-primary transition-all duration-200 block border-l-2 border-transparent pl-2.5 -ml-[11px] py-0.5 leading-snug"
+                      >
+                        {heading.text}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+            </div>
+          )}
+
+          <!-- Quick summary panel -->
+          <div class="bg-canvas-parchment rounded-lg border border-hairline p-[24px]">
+            <h4 class="font-caption-strong text-ink text-[14px] font-semibold mb-3">Learn SAP Free Academy</h4>
+            <p class="font-caption text-[14px] text-ink-muted-80 leading-relaxed mb-4">
+              Get detailed codes and theoretical study guides. Join our newsletter to receive daily tips directly to your development sandbox.
+            </p>
+            <button 
+              id="sidebar-subscribe" 
+              class="button-primary w-full text-[14px] font-semibold py-2.5"
+            >
+              Subscribe Free
+            </button>
+          </div>
+
+          <!-- Recent Guides List -->
+          <div>
+            <h3 class="font-caption-strong text-ink text-[14px] font-semibold mb-4 pb-2 border-b border-hairline">
+              Other Training Guides
+            </h3>
+            <div class="flex flex-col gap-5">
+              {recentPosts.map(p => (
+                <a href={`/blog/${p.id}`} class="group flex flex-col gap-1 ">
+                  <span class={`text-[11px] font-caption-strong uppercase tracking-wide ${getCategoryColorClass(p.data.category)}`}>
+                    {p.data.category}
+                  </span>
+                  <h4 class="font-body-strong text-[15px] text-ink group-hover:text-primary transition-colors leading-tight line-clamp-2">
+                    {p.data.title}
+                  </h4>
+                  <p class="font-fine-print text-ink-muted-80 line-clamp-2 leading-relaxed">
+                    {p.data.description}
+                  </p>
+                </a>
+              ))}
+            </div>
+          </div>
+        </aside>
+
+      </div>
+
+      <!-- Floating Scroll Progress & Back-to-Top Circle -->
+      <button 
+        id="scroll-progress-indicator" 
+        class="fixed bottom-8 right-8 z-50 w-[56px] h-[56px] bg-canvas rounded-full border border-hairline shadow-product flex items-center justify-center cursor-pointer transition-all duration-300 translate-y-[100px] opacity-0 hover:scale-105 active:scale-95 group"
+        aria-label="Scroll to top"
+      >
+        <!-- SVG Circular Progress -->
+        <svg class="absolute inset-0 w-full h-full -rotate-90">
+          <circle 
+            cx="28" 
+            cy="28" 
+            r="24" 
+            class="stroke-divider-soft fill-none stroke-[3]"
+          />
+          <circle 
+            id="progress-ring-circle" 
+            cx="28" 
+            cy="28" 
+            r="24" 
+            class="stroke-primary fill-none stroke-[3] transition-all duration-75"
+            stroke-dasharray="150.8"
+            stroke-dashoffset="150.8"
+          />
+        </svg>
+        
+        <!-- Text / Arrow inside the circle -->
+        <span 
+          id="progress-ring-text" 
+          class="font-fine-print font-bold text-[11px] text-ink group-hover:hidden"
+        >
+          0%
+        </span>
+        <svg 
+          class="w-4 h-4 text-primary fill-none stroke-current stroke-[2.5] hidden group-hover:block transition-all" 
+          viewBox="0 0 24 24"
+        >
+          <polyline points="18 15 12 9 6 15"></polyline>
+        </svg>
+      </button>
+
+    </div>
+  </div>
+</Layout>
+
+<script>
+  // Copy Link functionality
+  const copyBtn = document.getElementById('copy-link-btn');
+  copyBtn?.addEventListener('click', () => {
+    navigator.clipboard.writeText(window.location.href);
+    const originalText = copyBtn.textContent;
+    copyBtn.textContent = 'Copied!';
+    copyBtn.classList.add('bg-primary', 'text-white');
+    
+    setTimeout(() => {
+      copyBtn.textContent = originalText;
+      copyBtn.classList.remove('bg-primary', 'text-white');
+    }, 2000);
+  });
+
+  // Bookmark functionality
+  const bookmarkBtn = document.getElementById('bookmark-toggle-btn');
+  const outlineIcon = document.getElementById('bookmark-icon-outline');
+  const filledIcon = document.getElementById('bookmark-icon-filled');
+  const statusText = document.getElementById('bookmark-status-text');
+
+  if (bookmarkBtn && outlineIcon && filledIcon && statusText) {
+    const slug = bookmarkBtn.getAttribute('data-slug') || "";
+    const title = bookmarkBtn.getAttribute('data-title') || "";
+    const category = bookmarkBtn.getAttribute('data-category') || "";
+
+    const checkBookmarkState = () => {
+      try {
+        const bookmarks = JSON.parse(localStorage.getItem('sap_bookmarks') || '{}');
+        const isBookmarked = !!bookmarks[slug];
+
+        if (isBookmarked) {
+          outlineIcon.classList.add('hidden');
+          outlineIcon.classList.remove('block');
+          filledIcon.classList.add('block');
+          filledIcon.classList.remove('hidden');
+          statusText.textContent = 'Bookmarked';
+        } else {
+          outlineIcon.classList.add('block');
+          outlineIcon.classList.remove('hidden');
+          filledIcon.classList.add('hidden');
+          filledIcon.classList.remove('block');
+          statusText.textContent = 'Bookmark';
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    };
+
+    bookmarkBtn.addEventListener('click', () => {
+      try {
+        const bookmarks = JSON.parse(localStorage.getItem('sap_bookmarks') || '{}');
+        if (bookmarks[slug]) {
+          delete bookmarks[slug];
+        } else {
+          bookmarks[slug] = {
+            title,
+            category,
+            url: `/blog/${slug}`,
+            savedAt: new Date().toISOString()
+          };
+        }
+        localStorage.setItem('sap_bookmarks', JSON.stringify(bookmarks));
+        checkBookmarkState();
+
+        // Notify layout/home stats
+        window.dispatchEvent(new Event('sap-bookmarks-updated'));
+      } catch (e) {
+        console.error(e);
+      }
+    });
+
+    checkBookmarkState();
+  }
+
+  // Paragraph/Line-by-line Bookmarking
+  const setupLineBookmarking = () => {
+    const contentBody = document.querySelector('.rich-text');
+    if (!contentBody) return;
+
+    const postTitle = document.querySelector('h1')?.textContent || "SAP Tutorial";
+    const postSlug = window.location.pathname.split('/').pop() || "";
+
+    // Target paragraphs, subheadings, code blocks, lists, and quotes
+    const targets = contentBody.querySelectorAll('p, h2, h3, blockquote, .code-container');
+    
+    targets.forEach((el, index) => {
+      const element = el as HTMLElement;
+      
+      // Ensure unique element ID
+      if (!element.id) {
+        element.id = `line-${index + 1}`;
+      }
+
+      // Skip empty or tiny elements
+      const textContent = element.innerText?.trim() || "";
+      if (textContent.length < 5) return;
+
+      // Add relative positioning and group class for hover styling
+      element.classList.add('relative', 'group/line', 'pr-8');
+
+      // Create line bookmark button
+      const button = document.createElement('button');
+      button.className = 'line-bookmark-btn absolute right-0 top-1/2 -translate-y-1/2 opacity-60 lg:opacity-0 group-hover/line:opacity-100 hover:opacity-100 focus:opacity-100 transition-opacity bg-transparent border-none text-ink-muted-48 hover:text-primary cursor-pointer p-1.5 focus:outline-none flex items-center justify-center';
+      button.setAttribute('aria-label', 'Bookmark this section');
+      button.setAttribute('data-target-id', element.id);
+
+      // SVG icons
+      button.innerHTML = `
+        <svg class="line-bm-outline w-3.5 h-3.5 stroke-current fill-none stroke-[2] block" viewBox="0 0 24 24">
+          <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+        </svg>
+        <svg class="line-bm-filled w-3.5 h-3.5 stroke-current fill-current stroke-[2] hidden text-primary" viewBox="0 0 24 24">
+          <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+        </svg>
+      `;
+
+      element.appendChild(button);
+
+      // Bookmark action listener
+      button.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const elementId = element.id;
+        const bookmarkKey = `line-${postSlug}-${elementId}`;
+        
+        // Grab a short snippet of the text
+        let snippet = textContent;
+        if (snippet.length > 75) {
+          snippet = snippet.substring(0, 72) + "...";
+        }
+
+        try {
+          const bookmarks = JSON.parse(localStorage.getItem('sap_bookmarks') || '{}');
+          if (bookmarks[bookmarkKey]) {
+            delete bookmarks[bookmarkKey];
+          } else {
+            bookmarks[bookmarkKey] = {
+              title: `Snippet: "${snippet}"`,
+              category: postTitle.replace(" - Learn SAP Free", ""),
+              url: `/blog/${postSlug}#${elementId}`,
+              savedAt: new Date().toISOString()
+            };
+          }
+          localStorage.setItem('sap_bookmarks', JSON.stringify(bookmarks));
+          checkLineStates();
+
+          // Dispatch update event
+          window.dispatchEvent(new Event('sap-bookmarks-updated'));
+        } catch (err) {
+          console.error(err);
+        }
+      });
+    });
+
+    // Check states of all line bookmarks on load
+    const checkLineStates = () => {
+      try {
+        const bookmarks = JSON.parse(localStorage.getItem('sap_bookmarks') || '{}');
+        const buttons = contentBody.querySelectorAll('.line-bookmark-btn');
+        
+        buttons.forEach(btn => {
+          const button = btn as HTMLButtonElement;
+          const elementId = button.getAttribute('data-target-id') || "";
+          const bookmarkKey = `line-${postSlug}-${elementId}`;
+          const isBookmarked = !!bookmarks[bookmarkKey];
+
+          const outline = button.querySelector('.line-bm-outline');
+          const filled = button.querySelector('.line-bm-filled');
+
+          if (isBookmarked) {
+            outline?.classList.add('hidden');
+            filled?.classList.remove('hidden');
+          } else {
+            outline?.classList.remove('hidden');
+            filled?.classList.add('hidden');
+          }
+        });
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    checkLineStates();
+  };
+
+  setupLineBookmarking();
+
+  // Sidebar subscribe click delegation
+
+  const sidebarSub = document.getElementById('sidebar-subscribe');
+  const triggerButton = document.getElementById('subscribe-trigger');
+  sidebarSub?.addEventListener('click', () => {
+    triggerButton?.click(); // Activate subnav modal trigger
+  });
+
+  // Scroll Progress Circle Handler
+  const progressCircle = document.getElementById('progress-ring-circle') as SVGCircleElement | null;
+  const progressText = document.getElementById('progress-ring-text');
+  const indicator = document.getElementById('scroll-progress-indicator');
+
+  if (progressCircle && progressText && indicator) {
+    const radius = progressCircle.r.baseVal.value;
+    const circumference = 2 * Math.PI * radius; // ~150.8
+    
+    progressCircle.style.strokeDasharray = `${circumference}`;
+    
+    const updateProgress = () => {
+      const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const scrollTop = window.scrollY;
+      
+      if (scrollHeight <= 0) return;
+      
+      const percent = Math.min(Math.round((scrollTop / scrollHeight) * 100), 100);
+      
+      const offset = circumference - (percent / 100) * circumference;
+      progressCircle.style.strokeDashoffset = `${offset}`;
+      
+      progressText.textContent = `${percent}%`;
+      
+      if (scrollTop > 150) {
+        indicator.classList.remove('translate-y-[100px]', 'opacity-0');
+        indicator.classList.add('translate-y-0', 'opacity-100');
+      } else {
+        indicator.classList.remove('translate-y-0', 'opacity-100');
+        indicator.classList.add('translate-y-[100px]', 'opacity-0');
+      }
+    };
+    
+    window.addEventListener('scroll', updateProgress);
+    updateProgress();
+    
+    indicator.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
+
+  // Scroll Spy for Sidebar Table of Contents
+  const headingsElements = Array.from(document.querySelectorAll('.rich-text h2, .rich-text h3'));
+  const tocLinks = Array.from(document.querySelectorAll('.toc-sidebar-link'));
+
+  if (headingsElements.length > 0 && tocLinks.length > 0) {
+    const observerOptions = {
+      root: null,
+      rootMargin: '0px 0px -60% 0px',
+      threshold: 0.1
+    };
+
+    let activeLink: Element | null = null;
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const id = entry.target.getAttribute('id');
+          if (!id) return;
+          
+          // Deactivate previous active link
+          if (activeLink) {
+            activeLink.classList.remove('text-primary', 'border-primary', 'font-semibold');
+            activeLink.classList.add('border-transparent');
+          }
+          
+          // Activate new link
+          const correspondingLink = document.querySelector(`.toc-sidebar-link[data-toc-slug="${id}"]`);
+          if (correspondingLink) {
+            correspondingLink.classList.add('text-primary', 'border-primary', 'font-semibold');
+            correspondingLink.classList.remove('border-transparent');
+            activeLink = correspondingLink;
+          }
+        }
+      });
+    }, observerOptions);
+
+    headingsElements.forEach(heading => observer.observe(heading));
+  }
+
+  // 3. Interactive Glossary Tooltips (Jargon Help)
+  const GLOSSARY: Record<string, { name: string; desc: string }> = {
+    "ABAP": { name: "Advanced Business Application Programming", desc: "SAP's primary programming language used to build custom reports, database updates, and transaction workflows." },
+    "BAPI": { name: "Business Application Programming Interface", desc: "Standardized RFC-enabled function modules used to interface external applications with SAP business objects." },
+    "RFC": { name: "Remote Function Call", desc: "The standard SAP protocol for communication between separate SAP environments or with external systems." },
+    "IDOC": { name: "Intermediate Document", desc: "Standard data containers used to exchange business transaction records electronically (EDI/ALE) between systems." },
+    "ALV": { name: "ABAP List Viewer", desc: "A robust grid component used in SAP GUI to display, filter, sort, and export tabular data report outcomes." },
+    "BADI": { name: "Business Add-In", desc: "Object-oriented enhancement entry-points in standard SAP programs used by developers to insert custom code logic." },
+    "SE11": { name: "ABAP Dictionary", desc: "The core transaction code used to build, validate, and manage database tables, structures, views, domains, and data elements." },
+    "SE38": { name: "ABAP Editor", desc: "Standard transaction code used to write, edit, compile, check syntax, and execute ABAP reports and programs." },
+    "BTP": { name: "Business Technology Platform", desc: "SAP's unified cloud platform for custom application development, integration, analytics, and intelligent extensions." },
+    "ODATA": { name: "Open Data Protocol", desc: "A REST-based web protocol used by SAP Gateway to query and serve database records to Fiori front-end web apps." },
+    "FIORI": { name: "SAP Fiori", desc: "SAP's modern user interface design language and HTML5 UI5 framework that replaces classic SAP GUI client screens." },
+    "CDS": { name: "Core Data Services", desc: "A semantic database modeling language enabling developers to construct highly optimized data access queries in the database layer." },
+    "HANA": { name: "High-Performance Analytic Appliance", desc: "SAP's proprietary in-memory database management engine built to process enterprise data in real-time." },
+    "DDIC": { name: "ABAP Data Dictionary", desc: "The database-independent metadata repository representing structures, data elements, table keys, and domain value constraints." },
+    "SAPUI5": { name: "SAP UI Development Toolkit for HTML5", desc: "SAP's responsive HTML5 framework of UI controls used to build native-feeling web applications." },
+    "RAP": { name: "ABAP RESTful Application Programming", desc: "The modern development model for compiling SAP Fiori applications natively optimized for S/4HANA or cloud databases." },
+    "CAP": { name: "Cloud Application Programming Model", desc: "SAP's framework containing languages, libraries, and tools to construct enterprise cloud services in Node.js or Java." },
+    "CPI": { name: "Cloud Integration", desc: "SAP BTP's central middleware tool designed to bridge, translate, and route data securely between cloud and on-premise systems." },
+    "LSMW": { name: "Legacy System Migration Workbench", desc: "A legacy tool used to import, map, and migrate master or transactional records from legacy formats into SAP." },
+    "BDC": { name: "Batch Data Communication", desc: "An older automation method used to transfer mass records by simulating manual screen inputs inside SAP GUI." },
+    "S4HANA": { name: "SAP S/4HANA", desc: "SAP's next-generation business suite powered by the in-memory HANA database for real-time ERP processing." },
+    "ECC": { name: "ERP Central Component", desc: "SAP's traditional core ERP suite running on relational database management systems prior to the launch of S/4HANA." },
+    "SAP GUI": { name: "SAP Graphical User Interface", desc: "The legacy desktop client program used to log into, run transactions, and navigate traditional SAP systems." },
+    "GATEWAY": { name: "SAP NetWeaver Gateway", desc: "The integration framework that exposes business data from SAP systems as standardized RESTful OData services." },
+    "SMARTFORMS": { name: "SAP Smart Forms", desc: "An easy-to-use tool to print documents, invoices, purchase orders, or labels containing customized layouts." },
+    "SAPSCRIPT": { name: "SAPscript Word Processing", desc: "SAP's legacy text processing tool used for form layout design and document printing before Smart Forms." },
+    "ADOBE FORMS": { name: "Interactive Forms by Adobe", desc: "SAP's modern standard form layout engine used to build interactive PDFs and high-fidelity print documents." },
+    "BTE": { name: "Business Transaction Events", desc: "An integration and enhancement technique used primarily in the Finance (FI) module to trigger custom code on specific events." },
+    "WEB DYNPRO": { name: "Web Dynpro for ABAP", desc: "SAP's metadata-driven standard role-based web UI development technology for back-end applications." }
+  };
+
+  const setupGlossaryTooltips = () => {
+    const contentBody = document.querySelector('.rich-text');
+    if (!contentBody) return;
+
+    const terms = Object.keys(GLOSSARY).sort((a, b) => b.length - a.length);
+
+    const walkTextNodes = (node: Node) => {
+      if (node.nodeType === Node.TEXT_NODE) {
+        const text = node.nodeValue || "";
+        for (const term of terms) {
+          const regex = new RegExp(`\\b(${term})\\b`, 'i');
+          const match = text.match(regex);
+          if (match) {
+            const matchText = match[0];
+            const index = match.index ?? 0;
+
+            const beforeText = text.substring(0, index);
+            const afterText = text.substring(index + matchText.length);
+
+            const beforeNode = document.createTextNode(beforeText);
+            const afterNode = document.createTextNode(afterText);
+
+            const span = document.createElement('span');
+            span.className = 'glossary-term border-b border-dotted border-primary cursor-help relative inline-block group/tooltip text-ink font-semibold';
+            span.textContent = matchText;
+
+            const tooltip = document.createElement('span');
+            tooltip.className = 'glossary-tooltip absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-[260px] p-3 rounded-lg bg-surface-black/95 text-white text-[12px] font-normal leading-normal shadow-2xl opacity-0 scale-95 pointer-events-none group-hover/tooltip:opacity-100 group-hover/tooltip:scale-100 transition-all duration-200 z-50 text-left';
+            
+            const g = GLOSSARY[term.toUpperCase() as keyof typeof GLOSSARY];
+            tooltip.innerHTML = `
+              <strong class="block text-primary-on-dark text-[12px] font-body-strong mb-1 leading-tight">${g.name}</strong>
+              <span class="block text-white/80 leading-relaxed text-[11px]">${g.desc}</span>
+              <span class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-surface-black/95"></span>
+            `;
+            span.appendChild(tooltip);
+
+            const parent = node.parentNode;
+            if (parent) {
+              parent.insertBefore(beforeNode, node);
+              parent.insertBefore(span, node);
+              parent.insertBefore(afterNode, node);
+              parent.removeChild(node);
+              
+              // Walk the remaining split text node
+              walkTextNodes(afterNode);
+            }
+            break;
+          }
+        }
+      } else {
+        const el = node as Element;
+        const tagName = el.tagName;
+        if (
+          tagName !== 'SCRIPT' && 
+          tagName !== 'STYLE' && 
+          tagName !== 'PRE' && 
+          tagName !== 'CODE' && 
+          tagName !== 'A' &&
+          el.classList &&
+          !el.classList.contains('glossary-term') &&
+          !el.classList.contains('copy-code-btn')
+        ) {
+          const children = Array.from(node.childNodes);
+          children.forEach(child => walkTextNodes(child));
+        }
+      }
+    };
+
+    walkTextNodes(contentBody);
+
+    // Touch interactions support for mobile viewports
+    const glossaryTerms = contentBody.querySelectorAll('.glossary-term');
+    glossaryTerms.forEach(term => {
+      term.addEventListener('click', (e) => {
+        e.stopPropagation();
+        
+        const tooltip = term.querySelector('.glossary-tooltip');
+        if (!tooltip) return;
+
+        const isHidden = tooltip.classList.contains('opacity-0');
+        
+        // Hide all tooltips first
+        document.querySelectorAll('.glossary-tooltip').forEach(tt => {
+          tt.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
+          tt.classList.remove('opacity-100', 'scale-100');
+        });
+
+        if (isHidden) {
+          tooltip.classList.remove('opacity-0', 'scale-95', 'pointer-events-none');
+          tooltip.classList.add('opacity-100', 'scale-100');
+        }
+      });
+    });
+
+    // Dismiss all active tooltips on clicking outside
+    document.addEventListener('click', () => {
+      document.querySelectorAll('.glossary-tooltip').forEach(tt => {
+        tt.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
+        tt.classList.remove('opacity-100', 'scale-100');
+      });
+    });
+  };
+
+  setupGlossaryTooltips();
+
+
+</script>
+
+<!-- Blog scoped styles (rich text, code blocks, tables, interactive details) -->
+<style>
+  /* Sidebar Table of Contents links */
+  .toc-sidebar-link {
+    border-left-width: 2px;
+    transition: all 0.15s ease-in-out;
+  }
+  .toc-sidebar-link:hover {
+    padding-left: 12px;
+  }
+
+  /* Scope to blog content only */
+  .rich-text{
+    color: var(--color-ink);
+    line-height: 1.75;
+    font-family: var(--font-text);
+    font-size: 16px;
+  }
+
+  /* Headings */
+  .rich-text h2{
+    font-family: var(--font-display);
+    font-size: 24px;
+    line-height: 1.25;
+    margin: 28px 0 12px;
+    color: var(--color-ink);
+    letter-spacing: -0.01em;
+  }
+  .rich-text h3{
+    font-family: var(--font-body-strong);
+    font-size: 18px;
+    line-height: 1.3;
+    margin: 22px 0 10px;
+    color: var(--color-ink);
+  }
+
+  /* Paragraph spacing */
+  .rich-text p{
+    margin: 14px 0;
+    color: var(--color-ink-muted-80, var(--color-ink));
+  }
+
+  /* Links inside blog */
+  .rich-text a{
+    color: var(--color-primary, #0f62fe);
+    text-decoration: underline;
+    text-decoration-color: rgba(15, 98, 254, 0.35);
+    text-underline-offset: 3px;
+  }
+  .rich-text a:hover{
+    text-decoration-color: rgba(15, 98, 254, 0.8);
+  }
+
+  /* Lists */
+  .rich-text ul,
+  .rich-text ol{
+    padding-left: 1.1rem;
+    margin: 14px 0;
+  }
+  .rich-text li{
+    margin: 8px 0;
+  }
+
+  /* Blockquote (note/callout) */
+  .rich-text blockquote{
+    margin: 18px 0;
+    padding: 14px 16px;
+    border-left: 3px solid rgba(15, 98, 254, 0.5);
+    background: rgba(15, 98, 254, 0.06);
+    border-radius: 8px;
+  }
+
+  /* Code blocks */
+  .rich-text pre{
+    background: rgba(0,0,0,0.45);
+    border: 1px solid var(--color-hairline);
+    border-radius: 10px;
+    padding: 16px;
+    overflow: auto;
+    margin: 18px 0;
+  }
+  .rich-text pre code{
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #f3f4f6;
+  }
+
+  /* Inline code */
+  .rich-text :not(pre) > code{
+    background: rgba(0,0,0,0.35);
+    border: 1px solid rgba(255,255,255,0.08);
+    padding: 2px 6px;
+    border-radius: 7px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 0.92em;
+  }
+
+  /* Tables */
+  .rich-text table{
+    width: 100%;
+    border-collapse: collapse;
+    margin: 18px 0;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--color-hairline);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .rich-text th,
+  .rich-text td{
+    padding: 12px 12px;
+    border-bottom: 1px solid var(--color-hairline);
+    vertical-align: top;
+  }
+  .rich-text th{
+    background: rgba(255,255,255,0.05);
+    text-align: left;
+    font-weight: 700;
+  }
+  .rich-text tr:last-child td{
+    border-bottom: none;
+  }
+
+  /* Images in blog */
+  .rich-text img{
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+    border: 1px solid var(--color-hairline);
+  }
+
+  /* Interactive <details> blocks */
+  .rich-text details{
+    margin: 16px 0;
+    border: 1px solid var(--color-hairline);
+    background: rgba(255,255,255,0.02);
+    border-radius: 12px;
+    padding: 12px 14px;
+  }
+  .rich-text details > summary{
+    cursor: pointer;
+    font-weight: 700;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    user-select: none;
+  }
+  .rich-text details > summary::-webkit-details-marker{
+    display: none;
+  }
+  .rich-text details[open]{
+    background: rgba(15, 98, 254, 0.06);
+    border-color: rgba(15, 98, 254, 0.35);
+  }
+  .rich-text details > .details-content{
+    margin-top: 10px;
+  }
+
+  /* Subtle horizontal rule spacing */
+  .rich-text hr{
+    margin: 22px 0;
+    border: none;
+    height: 1px;
+    background: var(--color-hairline);
+  }
+</style>
