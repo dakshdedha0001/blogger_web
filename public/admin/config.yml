@@ -6,6 +6,8 @@
 
 backend:
   name: git-gateway
+  identity_url: "https://reliable-snickerdoodle-8afc8e.netlify.app/.netlify/identity"
+  gateway_url: "https://reliable-snickerdoodle-8afc8e.netlify.app/.netlify/git/github"
   branch: main
 
 # Netlify Identity handles auth — authors get email invite
