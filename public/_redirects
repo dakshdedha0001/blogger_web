@@ -1,4 +1,1 @@
-# Redirect rules for Cloudflare Pages & Netlify
-# Ensures Decap CMS SPA routing works seamlessly at /admin
-/admin/*    /admin/index.html    200
-/admin      /admin/index.html    200
+# Cloudflare Pages Redirects
