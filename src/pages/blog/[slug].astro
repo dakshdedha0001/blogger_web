@@ -3,6 +3,7 @@
 import { getCollection, render } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 import Quiz from '../../components/Quiz.astro';
+import RewardedAdGate from '../../components/RewardedAdGate.astro';
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog');
@@ -291,6 +292,9 @@ const videoSchema = post.data.video ? {
           <div class="rich-text">
             <Content />
           </div>
+
+          <!-- Rewarded Ad Gate Modal -->
+          <RewardedAdGate />
 
           <!-- Author Bio Card (E-E-A-T Signal) -->
           <div class="border-t border-hairline mt-[48px] pt-[32px]">

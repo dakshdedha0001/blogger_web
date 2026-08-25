@@ -7,7 +7,7 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build && cp dist/sitemap-index.xml dist/sitemap.xml && cp public/admin/index.html dist/admin.html",
+    "build": "astro build && cp dist/sitemap-index.xml dist/sitemap.xml",
     "preview": "astro preview",
     "astro": "astro",
     "deploy": "npx wrangler pages deploy dist --project-name learnsapfree --commit-dirty=true"

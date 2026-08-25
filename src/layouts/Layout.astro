@@ -175,23 +175,6 @@ const organizationSchema = {
 
 		<!-- Slot for page-specific head content (JSON-LD, etc.) -->
 		<slot name="head" />
-
-		<!-- Netlify Identity Widget — required for CMS email/password login redirect -->
-		<script src="https://identity.netlify.com/v1/netlify-identity-widget.js" is:inline></script>
-		<script is:inline>
-			if (window.netlifyIdentity) {
-				window.netlifyIdentity.init({
-					APIUrl: "https://reliable-snickerdoodle-8afc8e.netlify.app/.netlify/identity"
-				});
-				window.netlifyIdentity.on("init", function(user) {
-					if (!user) {
-						window.netlifyIdentity.on("login", function() {
-							document.location.href = "/admin/";
-						});
-					}
-				});
-			}
-		</script>
 	</head>
 	<body class="flex flex-col min-h-screen bg-canvas text-ink antialiased">
 		<!-- Top Reading Progress Bar -->
