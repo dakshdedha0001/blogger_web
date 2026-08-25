@@ -10,7 +10,7 @@
     "build": "astro build && cp dist/sitemap-index.xml dist/sitemap.xml",
     "preview": "astro preview",
     "astro": "astro",
-    "deploy": "npx wrangler pages deploy dist --project-name learnsapfree --commit-dirty=true"
+    "deploy": "npx wrangler pages deploy dist --project-name learnsapfree --branch=main --commit-dirty=true"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",
