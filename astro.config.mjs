@@ -27,8 +27,9 @@ function copySitemapIndex() {
 // https://astro.build/config
 export default defineConfig({
   site: 'https://learnsapfree.com',
+  trailingSlash: 'never',
   build: {
-    format: 'directory'
+    format: 'file'
   },
 
   vite: {
