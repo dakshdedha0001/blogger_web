@@ -1,84 +1,101 @@
 ---
-// src/components/GptOutOfPageAds.astro
+// src/components/GptOutOfPageAds.astro — Unified GPT Out-Of-Page Ads Manager
 ---
 
 <script is:inline>
   (function() {
-    function initOutOfPageAds() {
-      window.googletag = window.googletag || { cmd: [] };
+    window.googletag = window.googletag || { cmd: [] };
 
-      const loadGpt = () => {
-        window.googletag.cmd.push(() => {
-          // 1. Define Bottom Anchor Slot
-          let anchorSlot = null;
-          try {
-            anchorSlot = window.googletag.defineOutOfPageSlot(
-              "/23367961811/Anchor",
-              window.googletag.enums.OutOfPageFormat.BOTTOM_ANCHOR
-            );
-            if (!anchorSlot) {
-              console.log("Anchor ads not supported");
-            } else {
-              anchorSlot.addService(window.googletag.pubads());
-            }
-          } catch (e) {
-            console.log("Error defining Anchor slot:", e);
-          }
+    function initGptAds() {
+      googletag.cmd.push(() => {
+        // 1. Define Bottom Anchor Slot
+        let anchorSlot = null;
+        try {
+          anchorSlot = googletag.defineOutOfPageSlot(
+            "/23367961811/Anchor",
+            googletag.enums.OutOfPageFormat.BOTTOM_ANCHOR
+          );
+          if (anchorSlot) anchorSlot.addService(googletag.pubads());
+        } catch (e) {
+          console.log("Error defining Anchor slot:", e);
+        }
 
-          // 2. Define Interstitial Slot
-          let interstitialSlot = null;
-          try {
-            interstitialSlot = window.googletag.defineOutOfPageSlot(
-              "/23367961811/interstialad",
-              window.googletag.enums.OutOfPageFormat.INTERSTITIAL
-            );
-            if (!interstitialSlot) {
-              console.log("Interstitial ads not supported");
-            } else {
-              interstitialSlot.addService(window.googletag.pubads());
-            }
-          } catch (e) {
-            console.log("Error defining Interstitial slot:", e);
-          }
+        // 2. Define Interstitial Slot
+        let interstitialSlot = null;
+        try {
+          interstitialSlot = googletag.defineOutOfPageSlot(
+            "/23367961811/interstialad",
+            googletag.enums.OutOfPageFormat.INTERSTITIAL
+          );
+          if (interstitialSlot) interstitialSlot.addService(googletag.pubads());
+        } catch (e) {
+          console.log("Error defining Interstitial slot:", e);
+        }
 
-          // Set Adsense Page Config
-          window.googletag.setConfig({
-            adsenseAttributes: { page_url: "https://todaylimelight.com" }
-          });
+        // 3. Define Rewarded Slot
+        let rewardedSlot = null;
+        try {
+          rewardedSlot = googletag.defineOutOfPageSlot(
+            "/23367961811/reward/ad1",
+            googletag.enums.OutOfPageFormat.REWARDED
+          );
+          if (rewardedSlot) rewardedSlot.addService(googletag.pubads());
+        } catch (e) {
+          console.log("Error defining Rewarded slot:", e);
+        }
 
-          // Slot Render Event Listener
-          window.googletag.pubads().addEventListener("slotRenderEnded", (event) => {
-            if (event.slot === anchorSlot && event.isEmpty) {
-              console.log("No anchor ad returned");
-            }
-            if (event.slot === interstitialSlot && event.isEmpty) {
-              console.log("No interstitial ad returned");
-            }
-          });
+        // Global Page Config
+        googletag.setConfig({
+          adsenseAttributes: { page_url: "https://todaylimelight.com" }
+        });
 
-          window.googletag.enableServices();
+        // Event Listeners for Rewarded Ad Lifecycle
+        googletag.pubads().addEventListener("rewardedSlotReady", (event) => {
+          console.log("Rewarded ad is ready:", event);
+          window.__rewardedAdReadyEvent = event;
+          window.dispatchEvent(new CustomEvent("gpt-rewarded-ready", { detail: event }));
+        });
 
-          // Display slots
-          if (anchorSlot) {
-            window.googletag.display(anchorSlot);
-          }
-          if (interstitialSlot) {
-            window.googletag.display(interstitialSlot);
+        googletag.pubads().addEventListener("rewardedSlotVideoCompleted", () => {
+          console.log("Rewarded video completed");
+          window.dispatchEvent(new CustomEvent("gpt-reward-completed"));
+        });
+
+        googletag.pubads().addEventListener("rewardedSlotGranted", (event) => {
+          console.log("Reward granted:", event.payload);
+          window.dispatchEvent(new CustomEvent("gpt-reward-granted", { detail: event.payload }));
+        });
+
+        googletag.pubads().addEventListener("rewardedSlotClosed", () => {
+          console.log("Rewarded ad closed");
+          window.__rewardedAdReadyEvent = null;
+          window.dispatchEvent(new CustomEvent("gpt-reward-closed"));
+        });
+
+        googletag.pubads().addEventListener("slotRenderEnded", (event) => {
+          if (event.isEmpty) {
+            console.log("Slot empty:", event.slot);
           }
         });
-      };
 
-      if (!document.querySelector('script[src="https://securepubads.g.doubleclick.net/tag/js/gpt.js"]')) {
-        const gpt = document.createElement("script");
-        gpt.async = true;
-        gpt.src = "https://securepubads.g.doubleclick.net/tag/js/gpt.js";
-        gpt.onload = loadGpt;
-        document.head.appendChild(gpt);
-      } else {
-        loadGpt();
-      }
+        // Single enableServices call for the page
+        googletag.enableServices();
+
+        // Display out of page slots
+        if (anchorSlot) googletag.display(anchorSlot);
+        if (interstitialSlot) googletag.display(interstitialSlot);
+        if (rewardedSlot) googletag.display(rewardedSlot);
+      });
     }
 
-    setTimeout(initOutOfPageAds, Math.floor(Math.random() * 0) + 0);
+    if (!document.querySelector('script[src="https://securepubads.g.doubleclick.net/tag/js/gpt.js"]')) {
+      const gpt = document.createElement("script");
+      gpt.async = true;
+      gpt.src = "https://securepubads.g.doubleclick.net/tag/js/gpt.js";
+      gpt.onload = initGptAds;
+      document.head.appendChild(gpt);
+    } else {
+      initGptAds();
+    }
   })();
 </script>

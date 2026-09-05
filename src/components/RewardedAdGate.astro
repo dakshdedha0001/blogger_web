@@ -52,7 +52,7 @@
         <svg class="w-4 h-4 sm:w-5 sm:h-5 fill-current text-white transition-transform group-hover:scale-110 shrink-0" viewBox="0 0 24 24">
           <path d="M8 5v14l11-7z"/>
         </svg>
-        <span class="truncate">Watch Short Ad to Continue</span>
+        <span id="watch-btn-text" class="truncate">Watch Short Ad to Continue</span>
       </button>
 
       <!-- Close/Dismiss Option -->
@@ -81,12 +81,12 @@
     const modal = document.getElementById("rewarded-ad-popup-modal");
     const modalCard = document.getElementById("rewarded-modal-card");
     const watchBtn = document.getElementById("watch-rewarded-ad-btn");
+    const watchBtnText = document.getElementById("watch-btn-text");
     const closeBtn = document.getElementById("close-rewarded-modal-btn");
     const statusMsg = document.getElementById("ad-status-msg");
     const statusText = document.getElementById("ad-status-text");
 
-    let rewardedSlot = null;
-    let makeVisibleRef = null;
+    let isWaitingForAdReady = false;
 
     function openModal() {
       if (!modal) return;
@@ -110,107 +110,47 @@
 
     closeBtn?.addEventListener("click", closeModal);
 
-    // Show popup modal after brief delay (1.5 seconds) on page load
+    // Show popup modal after 1.5 seconds on page load
     setTimeout(openModal, 1500);
 
-    setTimeout(() => {
-      const gpt = document.createElement("script");
-      gpt.async = true;
-      gpt.src = "https://securepubads.g.doubleclick.net/tag/js/gpt.js";
-
-      gpt.onload = () => {
-        window.googletag = window.googletag || { cmd: [] };
-
-        googletag.cmd.push(() => {
-          rewardedSlot = googletag.defineOutOfPageSlot(
-            "/23367961811/reward/ad1",
-            googletag.enums.OutOfPageFormat.REWARDED
-          );
-
-          if (!rewardedSlot) {
-            console.log("Rewarded ads not supported");
-            return;
-          }
-
-          googletag.setConfig({
-            adsenseAttributes: { page_url: "https://todaylimelight.com" }
-          });
-
-          rewardedSlot.addService(googletag.pubads());
-
-          googletag.pubads().addEventListener("rewardedSlotReady", (event) => {
-            console.log("Rewarded ad ready");
-            makeVisibleRef = event;
-            if (statusText) statusText.innerText = "Ad ready! Click to play.";
-          });
-
-          googletag.pubads().addEventListener("rewardedSlotVideoCompleted", () => {
-            console.log("Video completed");
-            closeModal();
-          });
-
-          googletag.pubads().addEventListener("rewardedSlotGranted", (event) => {
-            console.log("Reward granted:", event.payload);
-            closeModal();
-          });
-
-          googletag.pubads().addEventListener("rewardedSlotClosed", () => {
-            console.log("Rewarded ad closed");
-            closeModal();
-            if (rewardedSlot) {
-              googletag.destroySlots([rewardedSlot]);
-              rewardedSlot = null;
-            }
-          });
-
-          googletag.pubads().addEventListener("slotRenderEnded", (event) => {
-            if (event.slot === rewardedSlot && event.isEmpty) {
-              console.log("No rewarded ad returned");
-            }
-          });
-
-          googletag.enableServices();
-          googletag.display(rewardedSlot);
-        });
-      };
-
-      if (!document.querySelector('script[src="https://securepubads.g.doubleclick.net/tag/js/gpt.js"]')) {
-        document.head.appendChild(gpt);
-      } else if (window.googletag && window.googletag.cmd) {
-        window.googletag.cmd.push(() => {
-          rewardedSlot = googletag.defineOutOfPageSlot(
-            "/23367961811/reward/ad1",
-            googletag.enums.OutOfPageFormat.REWARDED
-          );
-          if (rewardedSlot) {
-            googletag.setConfig({
-              adsenseAttributes: { page_url: "https://todaylimelight.com" }
-            });
-            rewardedSlot.addService(googletag.pubads());
-            googletag.enableServices();
-            googletag.display(rewardedSlot);
-          }
-        });
+    function triggerRewardedAd(readyEvent) {
+      if (!readyEvent) return;
+      try {
+        console.log("Triggering makeRewardedVisible()...");
+        readyEvent.makeRewardedVisible();
+      } catch (err) {
+        console.log("Error displaying rewarded ad:", err);
       }
+    }
 
-      watchBtn?.addEventListener("click", () => {
-        if (statusMsg) statusMsg.classList.remove("hidden");
-        if (statusText) statusText.innerText = "Opening ad...";
+    // Handle user click on "Watch Short Ad to Continue"
+    watchBtn?.addEventListener("click", () => {
+      if (statusMsg) statusMsg.classList.remove("hidden");
 
-        if (makeVisibleRef) {
-          try {
-            makeVisibleRef.makeRewardedVisible();
-          } catch (e) {
-            console.log("Trigger error:", e);
-          }
-        } else if (rewardedSlot) {
-          try {
-            googletag.display(rewardedSlot);
-          } catch (e) {
-            console.log("Display error:", e);
-          }
-        }
-      });
-    }, 100);
+      if (window.__rewardedAdReadyEvent) {
+        if (statusText) statusText.innerText = "Launching ad...";
+        triggerRewardedAd(window.__rewardedAdReadyEvent);
+      } else {
+        isWaitingForAdReady = true;
+        if (statusText) statusText.innerText = "Loading video ad... Please wait a moment.";
+        if (watchBtnText) watchBtnText.innerText = "Loading Ad...";
+      }
+    });
+
+    // Listen for GPT Ready custom event from GptOutOfPageAds manager
+    window.addEventListener("gpt-rewarded-ready", (e) => {
+      console.log("Received gpt-rewarded-ready event in UI");
+      if (statusText) statusText.innerText = "Ad ready! Click to play.";
+      if (watchBtnText) watchBtnText.innerText = "Watch Short Ad to Continue";
+
+      if (isWaitingForAdReady) {
+        isWaitingForAdReady = false;
+        triggerRewardedAd(e.detail);
+      }
+    });
+
+    window.addEventListener("gpt-reward-completed", closeModal);
+    window.addEventListener("gpt-reward-granted", closeModal);
+    window.addEventListener("gpt-reward-closed", closeModal);
   })();
 </script>
