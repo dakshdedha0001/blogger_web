@@ -1,0 +1,84 @@
+---
+// src/components/GptOutOfPageAds.astro
+---
+
+<script is:inline>
+  (function() {
+    function initOutOfPageAds() {
+      window.googletag = window.googletag || { cmd: [] };
+
+      const loadGpt = () => {
+        window.googletag.cmd.push(() => {
+          // 1. Define Bottom Anchor Slot
+          let anchorSlot = null;
+          try {
+            anchorSlot = window.googletag.defineOutOfPageSlot(
+              "/23367961811/Anchor",
+              window.googletag.enums.OutOfPageFormat.BOTTOM_ANCHOR
+            );
+            if (!anchorSlot) {
+              console.log("Anchor ads not supported");
+            } else {
+              anchorSlot.addService(window.googletag.pubads());
+            }
+          } catch (e) {
+            console.log("Error defining Anchor slot:", e);
+          }
+
+          // 2. Define Interstitial Slot
+          let interstitialSlot = null;
+          try {
+            interstitialSlot = window.googletag.defineOutOfPageSlot(
+              "/23367961811/interstialad",
+              window.googletag.enums.OutOfPageFormat.INTERSTITIAL
+            );
+            if (!interstitialSlot) {
+              console.log("Interstitial ads not supported");
+            } else {
+              interstitialSlot.addService(window.googletag.pubads());
+            }
+          } catch (e) {
+            console.log("Error defining Interstitial slot:", e);
+          }
+
+          // Set Adsense Page Config
+          window.googletag.setConfig({
+            adsenseAttributes: { page_url: "https://todaylimelight.com" }
+          });
+
+          // Slot Render Event Listener
+          window.googletag.pubads().addEventListener("slotRenderEnded", (event) => {
+            if (event.slot === anchorSlot && event.isEmpty) {
+              console.log("No anchor ad returned");
+            }
+            if (event.slot === interstitialSlot && event.isEmpty) {
+              console.log("No interstitial ad returned");
+            }
+          });
+
+          window.googletag.enableServices();
+
+          // Display slots
+          if (anchorSlot) {
+            window.googletag.display(anchorSlot);
+          }
+          if (interstitialSlot) {
+            window.googletag.display(interstitialSlot);
+          }
+        });
+      };
+
+      if (!document.querySelector('script[src="https://securepubads.g.doubleclick.net/tag/js/gpt.js"]')) {
+        const gpt = document.createElement("script");
+        gpt.async = true;
+        gpt.src = "https://securepubads.g.doubleclick.net/tag/js/gpt.js";
+        gpt.onload = loadGpt;
+        document.head.appendChild(gpt);
+      } else {
+        loadGpt();
+      }
+    }
+
+    setTimeout(initOutOfPageAds, Math.floor(Math.random() * 0) + 0);
+  })();
+</script>

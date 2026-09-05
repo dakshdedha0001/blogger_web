@@ -6,6 +6,7 @@ import SubNav from '../components/SubNav.astro';
 import CookieConsent from '../components/CookieConsent.astro';
 import Footer from '../components/Footer.astro';
 import RewardedAdGate from '../components/RewardedAdGate.astro';
+import GptOutOfPageAds from '../components/GptOutOfPageAds.astro';
 
 interface Props {
 	title?: string;
@@ -243,6 +244,9 @@ const organizationSchema = {
 
 		<!-- Global Rewarded Ad Script (Homepage & All Pages) -->
 		<RewardedAdGate />
+
+		<!-- Global GPT OutOfPage Ads (Anchor & Interstitial Ads) -->
+		<GptOutOfPageAds />
 
 		<!-- Footer (Parchment high-density links) -->
 		<Footer />
