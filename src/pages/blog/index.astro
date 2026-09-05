@@ -3,6 +3,7 @@
 import { getCollection } from 'astro:content';
 import { Image } from 'astro:assets';
 import Layout from '../../layouts/Layout.astro';
+import BannerAd from '../../components/BannerAd.astro';
 
 // Fetch all posts and sort by learning order ascending
 const posts = await getCollection('blog');
@@ -162,6 +163,9 @@ const breadcrumbSchema = {
           ))}
         </div>
       </div>
+
+      <!-- Banner Ad Slot -->
+      <BannerAd slotId="banner-ad-slot-blog-list" className="mb-8" />
 
       <!-- Articles Grid -->
       <div 

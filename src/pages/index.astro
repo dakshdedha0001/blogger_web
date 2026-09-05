@@ -5,6 +5,7 @@ import { Image } from 'astro:assets';
 import Layout from '../layouts/Layout.astro';
 import DailyTipCard from '../components/DailyTipCard.astro';
 import Quiz from '../components/Quiz.astro';
+import BannerAd from '../components/BannerAd.astro';
 
 // Fetch all blog posts and sort by learning order ascending
 const posts = await getCollection('blog');
@@ -333,6 +334,9 @@ const videoSchema = {
           Deep dive into comprehensive tutorials on modern SAP extensibility, database modeling, cloud integration, and systems configuration.
         </p>
       </div>
+
+      <!-- Banner Ad Slot -->
+      <BannerAd slotId="banner-ad-slot-home" className="mb-8" />
 
       <!-- Articles Grid -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[24px]">

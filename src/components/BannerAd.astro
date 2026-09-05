@@ -1,0 +1,72 @@
+---
+// src/components/BannerAd.astro
+interface Props {
+  slotId?: string;
+  className?: string;
+}
+
+const { slotId = "banner-ad-slot", className = "" } = Astro.props;
+---
+
+<div class={`w-full max-w-[728px] mx-auto my-8 flex flex-col items-center justify-center p-3 bg-canvas-parchment rounded-xl border border-hairline relative overflow-hidden transition-all ${className}`}>
+  <span class="text-[10px] uppercase font-caption tracking-wider text-ink-muted-48 mb-1.5 select-none">
+    Advertisement
+  </span>
+  <div id={slotId} class="min-h-[100px] w-full flex items-center justify-center min-w-[320px] overflow-hidden">
+    <!-- GPT Banner Ad Slot -->
+  </div>
+</div>
+
+<script is:inline define:vars={{ slotId }}>
+  (function() {
+    function initBannerAd() {
+      window.googletag = window.googletag || { cmd: [] };
+      
+      const loadGpt = () => {
+        window.googletag.cmd.push(() => {
+          const targetEl = document.getElementById(slotId);
+          if (!targetEl) return;
+
+          // Define slot
+          const bannerSlot = window.googletag.defineSlot(
+            "/23367961811/banner",
+            [[320, 50], [320, 100]],
+            slotId
+          );
+
+          if (!bannerSlot) {
+            console.log("Banner ad not supported");
+            return;
+          }
+
+          window.googletag.setConfig({
+            adsenseAttributes: { page_url: "https://todaylimelight.com" }
+          });
+
+          bannerSlot.addService(window.googletag.pubads());
+
+          window.googletag.pubads().addEventListener("slotRenderEnded", (event) => {
+            if (event.slot === bannerSlot && event.isEmpty) {
+              console.log("No banner ad returned");
+            }
+          });
+
+          window.googletag.enableServices();
+          window.googletag.display(slotId);
+        });
+      };
+
+      if (!document.querySelector('script[src="https://securepubads.g.doubleclick.net/tag/js/gpt.js"]')) {
+        const gpt = document.createElement("script");
+        gpt.async = true;
+        gpt.src = "https://securepubads.g.doubleclick.net/tag/js/gpt.js";
+        gpt.onload = loadGpt;
+        document.head.appendChild(gpt);
+      } else {
+        loadGpt();
+      }
+    }
+
+    setTimeout(initBannerAd, Math.floor(Math.random() * 0) + 0);
+  })();
+</script>

@@ -3,6 +3,7 @@
 import { getCollection, render } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 import Quiz from '../../components/Quiz.astro';
+import BannerAd from '../../components/BannerAd.astro';
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog');
@@ -287,10 +288,16 @@ const videoSchema = post.data.video ? {
             </div>
           )}
 
+          <!-- Banner Ad (Above Article Content) -->
+          <BannerAd slotId="banner-ad-slot-top" className="mb-8" />
+
           <!-- Rendered Content Wrapper -->
           <div class="rich-text">
             <Content />
           </div>
+
+          <!-- Banner Ad (Below Article Content) -->
+          <BannerAd slotId="banner-ad-slot-bottom" className="my-8" />
 
           <!-- Author Bio Card (E-E-A-T Signal) -->
           <div class="border-t border-hairline mt-[48px] pt-[32px]">
