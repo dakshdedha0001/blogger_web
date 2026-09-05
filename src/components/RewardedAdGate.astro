@@ -1,200 +1,214 @@
 ---
-// src/components/RewardedAdGate.astro — Website-styled Rewarded Ad Widget
+// src/components/RewardedAdGate.astro — Site-Styled Rewarded Ad Modal Popup
 ---
 
-<!-- Site-Styled Rewarded Ad Card Widget -->
-<div id="rewarded-ad-gate-widget" class="my-8 relative overflow-hidden rounded-2xl border border-hairline bg-canvas-parchment dark:bg-[#1c1c1e] dark:border-white/10 p-6 sm:p-8 shadow-sm transition-all duration-300">
-  <!-- Subtle ambient glow matching DESIGN.md guidelines -->
-  <div class="absolute -right-12 -top-12 w-48 h-48 bg-primary/5 rounded-full blur-3xl pointer-events-none"></div>
-  <div class="absolute -left-12 -bottom-12 w-48 h-48 bg-primary/10 rounded-full blur-3xl pointer-events-none"></div>
+<!-- Site-Styled Rewarded Ad Popup Modal -->
+<div 
+  id="rewarded-ad-popup-modal" 
+  class="fixed inset-0 z-[150] bg-black/65 backdrop-blur-md flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300"
+  role="dialog" 
+  aria-modal="true" 
+  aria-labelledby="rewarded-popup-title"
+>
+  <!-- Modal Card Chassis -->
+  <div class="bg-canvas border border-hairline max-w-md w-full rounded-2xl p-6 sm:p-8 shadow-2xl relative overflow-hidden text-center transform scale-95 transition-transform duration-300">
+    <!-- Ambient Blur Background Effect -->
+    <div class="absolute -right-10 -top-10 w-40 h-40 bg-primary/10 rounded-full blur-2xl pointer-events-none"></div>
+    <div class="absolute -left-10 -bottom-10 w-40 h-40 bg-primary/5 rounded-full blur-2xl pointer-events-none"></div>
 
-  <div class="relative z-10 flex flex-col items-center text-center max-w-xl mx-auto">
-    <!-- Sponsored Badge -->
-    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary font-caption-strong text-[12px] uppercase tracking-wider mb-4">
-      <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
-        <path d="M8 5v14l11-7z"/>
-      </svg>
-      <span>Sponsored Content Access</span>
-    </div>
+    <div class="relative z-10 flex flex-col items-center">
+      <!-- Icon Badge -->
+      <div class="w-14 h-14 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary mb-4 shadow-sm">
+        <svg class="w-7 h-7 fill-current ml-0.5" viewBox="0 0 24 24">
+          <path d="M8 5v14l11-7z"/>
+        </svg>
+      </div>
 
-    <!-- Main Heading requested by user -->
-    <h3 class="font-display-lg text-[22px] sm:text-[26px] text-ink dark:text-white leading-snug tracking-tight mb-2 font-semibold">
-      Watch a short ad to continue
-    </h3>
+      <!-- Tagline -->
+      <span class="text-primary font-caption-strong text-[12px] uppercase tracking-wider mb-2 block">
+        Free Tutorial Access
+      </span>
 
-    <!-- Subtext -->
-    <p class="font-caption text-[14px] sm:text-[15px] text-ink-muted-80 dark:text-gray-300 leading-relaxed mb-6">
-      Watch a quick sponsored video to support free SAP tutorials and unlock full step-by-step reading access.
-    </p>
+      <!-- Main Popup Heading -->
+      <h3 id="rewarded-popup-title" class="font-display-lg text-[22px] sm:text-[24px] text-ink leading-tight tracking-tight mb-2 font-semibold">
+        To continue reading, please watch a short ad
+      </h3>
 
-    <!-- Main Action Button matching Action Blue Pill design grammar -->
-    <button
-      id="watch-rewarded-ad-btn"
-      type="button"
-      class="button-primary group inline-flex items-center justify-center gap-2.5 px-8 py-3.5 bg-primary hover:bg-primary-focus text-white font-body-strong text-[16px] rounded-full shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer transform active:scale-95"
-    >
-      <svg class="w-5 h-5 fill-current text-white transition-transform group-hover:scale-110" viewBox="0 0 24 24">
-        <path d="M8 5v14l11-7z"/>
-      </svg>
-      <span>Watch a Short Ad to Continue</span>
-    </button>
+      <!-- Subtext -->
+      <p class="font-caption text-[14px] text-ink-muted-80 leading-relaxed mb-6">
+        Watch a brief sponsored video to unlock complete step-by-step reading access and support free SAP education.
+      </p>
 
-    <!-- Loading / Status indicator -->
-    <div id="ad-status-msg" class="mt-4 font-caption text-[13px] text-ink-muted-48 dark:text-gray-400 hidden flex items-center justify-center gap-2">
-      <svg class="w-4 h-4 animate-spin text-primary" viewBox="0 0 24 24" fill="none">
-        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-      </svg>
-      <span id="ad-status-text">Loading rewarded video ad...</span>
+      <!-- Action Button -->
+      <button
+        id="watch-rewarded-ad-btn"
+        type="button"
+        class="button-primary group w-full inline-flex items-center justify-center gap-2.5 py-3.5 bg-primary hover:bg-primary-focus text-white font-body-strong text-[15px] rounded-full shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer transform active:scale-95 mb-3"
+      >
+        <svg class="w-5 h-5 fill-current text-white transition-transform group-hover:scale-110" viewBox="0 0 24 24">
+          <path d="M8 5v14l11-7z"/>
+        </svg>
+        <span>Watch Short Ad to Continue</span>
+      </button>
+
+      <!-- Close/Dismiss Option -->
+      <button
+        id="close-rewarded-modal-btn"
+        type="button"
+        class="text-[13px] font-caption text-ink-muted-48 hover:text-ink transition-colors bg-transparent border-none cursor-pointer py-1"
+      >
+        Close & Continue Reading
+      </button>
+
+      <!-- Status Indicator -->
+      <div id="ad-status-msg" class="mt-4 font-caption text-[12px] text-ink-muted-48 hidden flex items-center justify-center gap-2">
+        <svg class="w-3.5 h-3.5 animate-spin text-primary" viewBox="0 0 24 24" fill="none">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <span id="ad-status-text">Preparing video ad...</span>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- User Provided GPT Rewarded Ad Script -->
 <script is:inline>
-setTimeout(() => {
-
-  const gpt = document.createElement("script");
-  gpt.async = true;
-  gpt.src = "https://securepubads.g.doubleclick.net/tag/js/gpt.js";
-
-  gpt.onload = () => {
-
-    window.googletag = window.googletag || { cmd: [] };
+  (function() {
+    const modal = document.getElementById("rewarded-ad-popup-modal");
+    const watchBtn = document.getElementById("watch-rewarded-ad-btn");
+    const closeBtn = document.getElementById("close-rewarded-modal-btn");
+    const statusMsg = document.getElementById("ad-status-msg");
+    const statusText = document.getElementById("ad-status-text");
 
     let rewardedSlot = null;
-    let rewardPayload = null;
+    let makeVisibleRef = null;
 
-    googletag.cmd.push(() => {
-
-      rewardedSlot = googletag.defineOutOfPageSlot(
-        "/23367961811/reward",
-        googletag.enums.OutOfPageFormat.REWARDED
-      );
-
-      // Rewarded ads unsupported
-      if (!rewardedSlot) {
-        console.log("Rewarded ads not supported");
-        return;
+    function openModal() {
+      if (!modal) return;
+      modal.classList.remove("pointer-events-none", "opacity-0");
+      modal.classList.add("opacity-100");
+      const card = modal.querySelector(".bg-canvas");
+      if (card) {
+        card.classList.remove("scale-95");
+        card.classList.add("scale-100");
       }
+    }
 
-      googletag.setConfig({
-        adsenseAttributes: { page_url: "https://todaylimelight.com" }
-      });
+    function closeModal() {
+      if (!modal) return;
+      modal.classList.remove("opacity-100");
+      modal.classList.add("opacity-0", "pointer-events-none");
+      const card = modal.querySelector(".bg-canvas");
+      if (card) {
+        card.classList.remove("scale-100");
+        card.classList.add("scale-95");
+      }
+    }
 
-      rewardedSlot.addService(googletag.pubads());
+    closeBtn?.addEventListener("click", closeModal);
 
-      let makeVisibleRef = null;
+    // Show popup modal after brief delay (1.5 seconds) on page load
+    setTimeout(openModal, 1500);
 
-      // Ad ready → enable button & auto trigger
-      googletag.pubads().addEventListener(
-        "rewardedSlotReady",
-        (event) => {
+    setTimeout(() => {
+      const gpt = document.createElement("script");
+      gpt.async = true;
+      gpt.src = "https://securepubads.g.doubleclick.net/tag/js/gpt.js";
 
-          console.log("Rewarded ad ready");
-          makeVisibleRef = event;
+      gpt.onload = () => {
+        window.googletag = window.googletag || { cmd: [] };
 
-          const statusText = document.getElementById("ad-status-text");
-          if (statusText) statusText.innerText = "Ad ready! Displaying video...";
+        googletag.cmd.push(() => {
+          // Define rewarded slot with updated path /23367961811/reward/ad1
+          rewardedSlot = googletag.defineOutOfPageSlot(
+            "/23367961811/reward/ad1",
+            googletag.enums.OutOfPageFormat.REWARDED
+          );
 
-          // AUTO SHOW AD
-          try {
-            event.makeRewardedVisible();
-          } catch(e) {
-            console.log("Auto-show fallback", e);
+          if (!rewardedSlot) {
+            console.log("Rewarded ads not supported");
+            return;
           }
-        }
-      );
 
-      // Video completed
-      googletag.pubads().addEventListener(
-        "rewardedSlotVideoCompleted",
-        () => {
-          console.log("Video completed");
-          const widget = document.getElementById("rewarded-ad-gate-widget");
-          if (widget) widget.classList.add("hidden");
-        }
-      );
+          googletag.setConfig({
+            adsenseAttributes: { page_url: "https://todaylimelight.com" }
+          });
 
-      // Reward granted
-      googletag.pubads().addEventListener(
-        "rewardedSlotGranted",
-        (event) => {
+          rewardedSlot.addService(googletag.pubads());
 
-          rewardPayload = event.payload;
+          googletag.pubads().addEventListener("rewardedSlotReady", (event) => {
+            console.log("Rewarded ad ready");
+            makeVisibleRef = event;
+            if (statusText) statusText.innerText = "Ad ready! Click to play.";
+          });
 
-          console.log(
-            "Reward granted:",
-            rewardPayload.amount,
-            rewardPayload.type
+          googletag.pubads().addEventListener("rewardedSlotVideoCompleted", () => {
+            console.log("Video completed");
+            closeModal();
+          });
+
+          googletag.pubads().addEventListener("rewardedSlotGranted", (event) => {
+            console.log("Reward granted:", event.payload);
+            closeModal();
+          });
+
+          googletag.pubads().addEventListener("rewardedSlotClosed", () => {
+            console.log("Rewarded ad closed");
+            closeModal();
+            if (rewardedSlot) {
+              googletag.destroySlots([rewardedSlot]);
+              rewardedSlot = null;
+            }
+          });
+
+          googletag.pubads().addEventListener("slotRenderEnded", (event) => {
+            if (event.slot === rewardedSlot && event.isEmpty) {
+              console.log("No rewarded ad returned");
+            }
+          });
+
+          googletag.enableServices();
+          googletag.display(rewardedSlot);
+        });
+      };
+
+      if (!document.querySelector('script[src="https://securepubads.g.doubleclick.net/tag/js/gpt.js"]')) {
+        document.head.appendChild(gpt);
+      } else if (window.googletag && window.googletag.cmd) {
+        window.googletag.cmd.push(() => {
+          rewardedSlot = googletag.defineOutOfPageSlot(
+            "/23367961811/reward/ad1",
+            googletag.enums.OutOfPageFormat.REWARDED
           );
-
-          alert(
-            `Reward Earned: ${rewardPayload.amount} ${rewardPayload.type}`
-          );
-          const widget = document.getElementById("rewarded-ad-gate-widget");
-          if (widget) widget.classList.add("hidden");
-        }
-      );
-
-      // Ad closed
-      googletag.pubads().addEventListener(
-        "rewardedSlotClosed",
-        () => {
-
-          console.log("Rewarded ad closed");
-
           if (rewardedSlot) {
-            googletag.destroySlots([rewardedSlot]);
-            rewardedSlot = null;
-          }
-        }
-      );
-
-      // No ad fill
-      googletag.pubads().addEventListener(
-        "slotRenderEnded",
-        (event) => {
-
-          if (event.slot === rewardedSlot && event.isEmpty) {
-            console.log("No rewarded ad returned");
-          }
-        }
-      );
-
-      googletag.enableServices();
-
-      // Request ad
-      googletag.display(rewardedSlot);
-
-      // Manual button trigger binding
-      const watchBtn = document.getElementById("watch-rewarded-ad-btn");
-      if (watchBtn) {
-        watchBtn.addEventListener("click", () => {
-          const statusMsg = document.getElementById("ad-status-msg");
-          if (statusMsg) statusMsg.classList.remove("hidden");
-
-          if (makeVisibleRef) {
-            try {
-              makeVisibleRef.makeRewardedVisible();
-            } catch (e) {
-              console.log("Trigger error", e);
-            }
-          } else {
-            try {
-              googletag.display(rewardedSlot);
-            } catch (e) {
-              console.log("Display error", e);
-            }
+            googletag.setConfig({
+              adsenseAttributes: { page_url: "https://todaylimelight.com" }
+            });
+            rewardedSlot.addService(googletag.pubads());
+            googletag.enableServices();
+            googletag.display(rewardedSlot);
           }
         });
       }
 
-    });
+      watchBtn?.addEventListener("click", () => {
+        if (statusMsg) statusMsg.classList.remove("hidden");
+        if (statusText) statusText.innerText = "Opening ad...";
 
-  };
-
-  document.head.appendChild(gpt);
-
-}, Math.floor(Math.random() * 0) + 000);
+        if (makeVisibleRef) {
+          try {
+            makeVisibleRef.makeRewardedVisible();
+          } catch (e) {
+            console.log("Trigger error:", e);
+          }
+        } else if (rewardedSlot) {
+          try {
+            googletag.display(rewardedSlot);
+          } catch (e) {
+            console.log("Display error:", e);
+          }
+        }
+      });
+    }, 100);
+  })();
 </script>
