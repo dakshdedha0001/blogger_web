@@ -1,8 +1,56 @@
 ---
-// src/components/RewardedAdGate.astro — Automated GPT Rewarded Ad Script (No Manual Button)
+// src/components/RewardedAdGate.astro — Website-styled Rewarded Ad Widget
 ---
 
-<!-- User Provided GPT Rewarded Ad Script (Auto-triggers on page/blog load) -->
+<!-- Site-Styled Rewarded Ad Card Widget -->
+<div id="rewarded-ad-gate-widget" class="my-8 relative overflow-hidden rounded-2xl border border-hairline bg-canvas-parchment dark:bg-[#1c1c1e] dark:border-white/10 p-6 sm:p-8 shadow-sm transition-all duration-300">
+  <!-- Subtle ambient glow matching DESIGN.md guidelines -->
+  <div class="absolute -right-12 -top-12 w-48 h-48 bg-primary/5 rounded-full blur-3xl pointer-events-none"></div>
+  <div class="absolute -left-12 -bottom-12 w-48 h-48 bg-primary/10 rounded-full blur-3xl pointer-events-none"></div>
+
+  <div class="relative z-10 flex flex-col items-center text-center max-w-xl mx-auto">
+    <!-- Sponsored Badge -->
+    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary font-caption-strong text-[12px] uppercase tracking-wider mb-4">
+      <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+        <path d="M8 5v14l11-7z"/>
+      </svg>
+      <span>Sponsored Content Access</span>
+    </div>
+
+    <!-- Main Heading requested by user -->
+    <h3 class="font-display-lg text-[22px] sm:text-[26px] text-ink dark:text-white leading-snug tracking-tight mb-2 font-semibold">
+      Watch a short ad to continue
+    </h3>
+
+    <!-- Subtext -->
+    <p class="font-caption text-[14px] sm:text-[15px] text-ink-muted-80 dark:text-gray-300 leading-relaxed mb-6">
+      Watch a quick sponsored video to support free SAP tutorials and unlock full step-by-step reading access.
+    </p>
+
+    <!-- Main Action Button matching Action Blue Pill design grammar -->
+    <button
+      id="watch-rewarded-ad-btn"
+      type="button"
+      class="button-primary group inline-flex items-center justify-center gap-2.5 px-8 py-3.5 bg-primary hover:bg-primary-focus text-white font-body-strong text-[16px] rounded-full shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer transform active:scale-95"
+    >
+      <svg class="w-5 h-5 fill-current text-white transition-transform group-hover:scale-110" viewBox="0 0 24 24">
+        <path d="M8 5v14l11-7z"/>
+      </svg>
+      <span>Watch a Short Ad to Continue</span>
+    </button>
+
+    <!-- Loading / Status indicator -->
+    <div id="ad-status-msg" class="mt-4 font-caption text-[13px] text-ink-muted-48 dark:text-gray-400 hidden flex items-center justify-center gap-2">
+      <svg class="w-4 h-4 animate-spin text-primary" viewBox="0 0 24 24" fill="none">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      <span id="ad-status-text">Loading rewarded video ad...</span>
+    </div>
+  </div>
+</div>
+
+<!-- User Provided GPT Rewarded Ad Script -->
 <script is:inline>
 setTimeout(() => {
 
@@ -36,15 +84,25 @@ setTimeout(() => {
 
       rewardedSlot.addService(googletag.pubads());
 
-      // Ad ready → auto show immediately without requiring manual button click
+      let makeVisibleRef = null;
+
+      // Ad ready → enable button & auto trigger
       googletag.pubads().addEventListener(
         "rewardedSlotReady",
         (event) => {
 
-          console.log("Rewarded ad ready — auto showing");
+          console.log("Rewarded ad ready");
+          makeVisibleRef = event;
+
+          const statusText = document.getElementById("ad-status-text");
+          if (statusText) statusText.innerText = "Ad ready! Displaying video...";
 
           // AUTO SHOW AD
-          event.makeRewardedVisible();
+          try {
+            event.makeRewardedVisible();
+          } catch(e) {
+            console.log("Auto-show fallback", e);
+          }
         }
       );
 
@@ -53,6 +111,8 @@ setTimeout(() => {
         "rewardedSlotVideoCompleted",
         () => {
           console.log("Video completed");
+          const widget = document.getElementById("rewarded-ad-gate-widget");
+          if (widget) widget.classList.add("hidden");
         }
       );
 
@@ -72,6 +132,8 @@ setTimeout(() => {
           alert(
             `Reward Earned: ${rewardPayload.amount} ${rewardPayload.type}`
           );
+          const widget = document.getElementById("rewarded-ad-gate-widget");
+          if (widget) widget.classList.add("hidden");
         }
       );
 
@@ -104,6 +166,29 @@ setTimeout(() => {
 
       // Request ad
       googletag.display(rewardedSlot);
+
+      // Manual button trigger binding
+      const watchBtn = document.getElementById("watch-rewarded-ad-btn");
+      if (watchBtn) {
+        watchBtn.addEventListener("click", () => {
+          const statusMsg = document.getElementById("ad-status-msg");
+          if (statusMsg) statusMsg.classList.remove("hidden");
+
+          if (makeVisibleRef) {
+            try {
+              makeVisibleRef.makeRewardedVisible();
+            } catch (e) {
+              console.log("Trigger error", e);
+            }
+          } else {
+            try {
+              googletag.display(rewardedSlot);
+            } catch (e) {
+              console.log("Display error", e);
+            }
+          }
+        });
+      }
 
     });
 
